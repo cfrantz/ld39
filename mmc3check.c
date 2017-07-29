@@ -78,11 +78,11 @@ void main(void)
 
         scroll(0, 24);
 
-    tm = readreg8(0x4019);
         entity_player_control();
-        entity_compute_position(0);
-        entity_draw(0);
     tm = readreg8(0x4019);
+        entity_compute_position(0);
+    tm = readreg8(0x4019);
+        entity_draw(0);
 
 #if 0
         if ((framenum & 7) == 0) {
@@ -90,10 +90,10 @@ void main(void)
         }
         spr = oam_spr(20, 40, dude[a], 0, spr);
         val = spr;
-#endif
 
         update_reset();
         update(0, 10, xdigits[(uint8_t)framenum >> 4]);
         update(1, 10, xdigits[(uint8_t)framenum & 15]);
+#endif
     }
 }
