@@ -43,179 +43,170 @@ uint8_t entity_on_ground[MAX_ENTITY];
 int8_t entity_dir[MAX_ENTITY];
 uint8_t entity_anim[MAX_ENTITY];
 
-uint8_t entity_left_collision(uint8_t index, int delta) {
-    static uint8_t id;
+static uint8_t cur_id;
+static uint8_t cur_index;
+
+uint8_t __fastcall__ entity_left_collision(int delta) {
     static uint16_t px;
     static uint8_t py, xx;
 
-    id = entity_id[index];
-    px = entity_px[index] + delta;
-    px += entity_colx[id][0] << 8;
+    px = entity_px[cur_index] + delta;
+    px += entity_colx[cur_id][0] << 8;
     xx = px >> 8;
-    py = entity_py[index] >> 8;
-    if (basic_collision(xx, py + entity_colx[id][1]) ||
-        basic_collision(xx, py + entity_colx[id][3])) {
+    py = entity_py[cur_index] >> 8;
+    if (basic_collision(xx, py + entity_colx[cur_id][1]) ||
+        basic_collision(xx, py + entity_colx[cur_id][3])) {
         return xx & 0xf0;
     }
     return 0;
 }
 
-uint8_t entity_right_collision(uint8_t index, int delta) {
-    static uint8_t id;
+uint8_t __fastcall__ entity_right_collision(int delta) {
     static uint16_t px;
     static uint8_t py, xx;
 
-    id = entity_id[index];
-    px = entity_px[index] + delta;
-    px += entity_colx[id][2] << 8;
+    px = entity_px[cur_index] + delta;
+    px += entity_colx[cur_id][2] << 8;
     xx = px >> 8;
-    py = entity_py[index] >> 8;
-    if (basic_collision(xx, py + entity_colx[id][1]) ||
-        basic_collision(xx, py + entity_colx[id][3])) {
+    py = entity_py[cur_index] >> 8;
+    if (basic_collision(xx, py + entity_colx[cur_id][1]) ||
+        basic_collision(xx, py + entity_colx[cur_id][3])) {
         return xx & 0xf0;
     }
     return 0;
 }
 
-uint8_t entity_top_collision(uint8_t index, int delta) {
-    static uint8_t id;
+uint8_t __fastcall__ entity_top_collision(int delta) {
     static uint16_t py;
     static uint8_t px, yy;
 
-    id = entity_id[index];
-    py = entity_py[index] + delta;
-    py += entity_coly[id][1] << 8;
+    py = entity_py[cur_index] + delta;
+    py += entity_coly[cur_id][1] << 8;
     yy = py >> 8;
-    px = entity_px[index] >> 8;
-    if (basic_collision(px + entity_coly[id][0], yy) ||
-        basic_collision(px + entity_coly[id][2], yy)) {
+    px = entity_px[cur_index] >> 8;
+    if (basic_collision(px + entity_coly[cur_id][0], yy) ||
+        basic_collision(px + entity_coly[cur_id][2], yy)) {
         return yy & 0xf0;
     }
     return 0;
 }
 
-uint8_t entity_bottom_collision(uint8_t index, int delta) {
-    static uint8_t id;
+uint8_t __fastcall__ entity_bottom_collision(int delta) {
     static uint16_t py;
     static uint8_t px, yy;
 
-    id = entity_id[index];
-    py = entity_py[index] + delta;
-    py += entity_coly[id][3] << 8;
+    py = entity_py[cur_index] + delta;
+    py += entity_coly[cur_id][3] << 8;
     yy = py >> 8;
-    px = entity_px[index] >> 8;
-    if (basic_collision(px + entity_coly[id][0], yy) ||
-        basic_collision(px + entity_coly[id][2], yy)) {
+    px = entity_px[cur_index] >> 8;
+    if (basic_collision(px + entity_coly[cur_id][0], yy) ||
+        basic_collision(px + entity_coly[cur_id][2], yy)) {
         return yy & 0xf0;
     }
     return 0;
 }
 
-void entity_compute_position_x(uint8_t index) {
-    static uint8_t id;
+void __fastcall__ entity_compute_position_x(void) {
     static uint8_t c;
 
-    id = entity_id[index];
-    if (entity_vx[index] > 0) {
-        c = entity_right_collision(index, entity_vx[index]);
+    if (entity_vx[cur_index] > 0) {
+        c = entity_right_collision(entity_vx[cur_index]);
         if (c) {
-            entity_px[index] = (c - entity_colx[id][2]) << 8;
-            entity_vx[index] = 0;
+            entity_px[cur_index] = (c - entity_colx[cur_id][2]) << 8;
+            entity_vx[cur_index] = 0;
         } else {
-            entity_px[index] += entity_vx[index];
+            entity_px[cur_index] += entity_vx[cur_index];
         }
-        c = entity_left_collision(index, 0);
+        c = entity_left_collision(0);
         if (c) {
-            entity_px[index] = (c + 0x10 - entity_colx[id][0]) << 8;
+            entity_px[cur_index] = (c + 0x10 - entity_colx[cur_id][0]) << 8;
         }
     } else {
-        c = entity_left_collision(index, entity_vx[index]);
+        c = entity_left_collision(entity_vx[cur_index]);
         if (c) {
-            entity_px[index] = (c + 0x10 - entity_colx[id][0]) << 8;
-            entity_vx[index] = 0;
+            entity_px[cur_index] = (c + 0x10 - entity_colx[cur_id][0]) << 8;
+            entity_vx[cur_index] = 0;
         } else {
-            entity_px[index] += entity_vx[index];
+            entity_px[cur_index] += entity_vx[cur_index];
         }
-        c = entity_right_collision(index, 0);
+        c = entity_right_collision(0);
         if (c) {
-            entity_px[index] = (c - entity_colx[id][2]) << 8;
+            entity_px[cur_index] = (c - entity_colx[cur_id][2]) << 8;
         }
     }
 }
 
-void entity_compute_position_y(uint8_t index) {
-    static uint8_t id;
+void __fastcall__ entity_compute_position_y(void) {
     static uint8_t c;
 
-    id = entity_id[index];
-    entity_on_ground[index] = 0;
-    if (entity_vy[index] > 0) {
-        c = entity_bottom_collision(index, entity_vy[index]);
+    entity_on_ground[cur_index] = 0;
+    if (entity_vy[cur_index] > 0) {
+        c = entity_bottom_collision(entity_vy[cur_index]);
         if (c) {
-            entity_py[index] = (c - entity_coly[id][3]) << 8;
-            entity_vy[index] = 0;
-            entity_on_ground[index] = 1;
+            entity_py[cur_index] = (c - entity_coly[cur_id][3]) << 8;
+            entity_vy[cur_index] = 0;
+            entity_on_ground[cur_index] = 1;
         } else {
-            entity_py[index] += entity_vy[index];
+            entity_py[cur_index] += entity_vy[cur_index];
         }
-        c = entity_top_collision(index, 0);
+        c = entity_top_collision(0);
         if (c) {
-            entity_py[index] = (c + 0x10 - entity_coly[id][1]) << 8;
+            entity_py[cur_index] = (c + 0x10 - entity_coly[cur_id][1]) << 8;
         }
     } else {
-        c = entity_top_collision(index, entity_vy[index]);
+        c = entity_top_collision(entity_vy[cur_index]);
         if (c) {
-            entity_py[index] = (c + 0x10 - entity_coly[id][1]) << 8;
-            entity_vy[index] = 0;
+            entity_py[cur_index] = (c + 0x10 - entity_coly[cur_id][1]) << 8;
+            entity_vy[cur_index] = 0;
         } else {
-            entity_py[index] += entity_vy[index];
+            entity_py[cur_index] += entity_vy[cur_index];
         }
-        c = entity_bottom_collision(index, 0);
+        c = entity_bottom_collision(0);
         if (c) {
-            entity_py[index] = (c - entity_coly[id][3]) << 8;
+            entity_py[cur_index] = (c - entity_coly[cur_id][3]) << 8;
         }
     }
 }
 
 
-void entity_compute_position(uint8_t index) {
-    static uint8_t id;
+void __fastcall__ entity_compute_position(uint8_t entity) {
     static int fx;
 
-    id = entity_id[index];
+    cur_index = entity;
+    cur_id = entity_id[cur_index];
     fx = 0;
-    if (entity_on_ground[index])
+    if (entity_on_ground[cur_index])
         fx = 0x0040;
 
-    if (entity_vx[index] > 0)
-        entity_vx[index] -= fx;
-    else if (entity_vx[index] < 0)
-        entity_vx[index] += fx;
+    if (entity_vx[cur_index] > 0)
+        entity_vx[cur_index] -= fx;
+    else if (entity_vx[cur_index] < 0)
+        entity_vx[cur_index] += fx;
 
-    entity_vx[index] += entity_ax[index];
-    entity_vy[index] += entity_ay[index];
+    entity_vx[cur_index] += entity_ax[cur_index];
+    entity_vy[cur_index] += entity_ay[cur_index];
 
-    if (entity_vx[index] > entity_maxx[id]) {
-        entity_vx[index] = entity_maxx[id];
-    } else if (entity_vx[index] < -entity_maxx[id]) {
-        entity_vx[index] = -entity_maxx[id];
+    if (entity_vx[cur_index] > entity_maxx[cur_id]) {
+        entity_vx[cur_index] = entity_maxx[cur_id];
+    } else if (entity_vx[cur_index] < -entity_maxx[cur_id]) {
+        entity_vx[cur_index] = -entity_maxx[cur_id];
     }
-    if (entity_vy[index] > entity_maxy[id]) {
-        entity_vy[index] = entity_maxy[id];
-    } else if (entity_vy[index] < -entity_maxy[id]) {
-        entity_vy[index] = -entity_maxy[id];
+    if (entity_vy[cur_index] > entity_maxy[cur_id]) {
+        entity_vy[cur_index] = entity_maxy[cur_id];
+    } else if (entity_vy[cur_index] < -entity_maxy[cur_id]) {
+        entity_vy[cur_index] = -entity_maxy[cur_id];
     }
 
-    entity_compute_position_x(index);
-    entity_compute_position_y(index);
+    entity_compute_position_x();
+    entity_compute_position_y();
 }
 
-void entity_newframe(void) {
+void __fastcall__ entity_newframe(void) {
     spridx = 0;
     entity_ay[0] = 0x100;
 }
 
-void entity_draw(uint8_t index) {
+void __fastcall__ entity_draw(uint8_t index) {
     static uint8_t id;
     static uint8_t a, flags;
     id = entity_id[index];
@@ -227,7 +218,7 @@ void entity_draw(uint8_t index) {
 
 }
 
-void entity_set_position(uint8_t index, uint8_t x, uint8_t y) {
+void __fastcall__ entity_set_position(uint8_t index, uint8_t x, uint8_t y) {
     entity_ax[index] = 0;
     entity_ay[index] = 0;
     entity_vx[index] = 0;
@@ -238,7 +229,7 @@ void entity_set_position(uint8_t index, uint8_t x, uint8_t y) {
 }
 
 
-void entity_player_control(void) {
+void __fastcall__ entity_player_control(void) {
     player_pad = pad_poll(0);
 
     if (player_pad & PAD_LEFT) {

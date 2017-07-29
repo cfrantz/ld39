@@ -83,10 +83,10 @@ void copy_to_vram_simple() {
     }
 }
 
-uint8_t basic_collision(uint8_t x, uint8_t y) {
+uint8_t __fastcall__ basic_collision(uint8_t x, uint8_t y) {
     x = x/16;
     y = y/16;
 //    printf("bc %d %d %02x\n", x, y, screen[y*16+x] & 0x0C);
-    return screen[y*16+x] & 0x0C;
+    return screen[(uint8_t)(y*16+x)] & 0x0C;
 }
 
