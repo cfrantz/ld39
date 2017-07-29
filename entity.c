@@ -8,14 +8,15 @@ uint8_t player_pad;
 uint8_t player_jump;
 uint8_t spridx;
 
-uint8_t entity_colx[][4] = {
-    { 1, 2, 6, 14 },
-};
+uint8_t entity_colx_x0[] = {  1, };
+uint8_t entity_colx_y0[] = {  2, };
+uint8_t entity_colx_x1[] = {  6, };
+uint8_t entity_colx_y1[] = { 14, };
 
-uint8_t entity_coly[][4] = {
-    //{ 1, 1, 6, 14 },
-    { 2, 0, 5, 16 },
-};
+uint8_t entity_coly_x0[] = {  2, };
+uint8_t entity_coly_y0[] = {  0, };
+uint8_t entity_coly_x1[] = {  5, };
+uint8_t entity_coly_y1[] = { 16, };
 
 uint8_t entity_sprites[][4] = {
     { 1, 3, 1, 3 },
@@ -51,11 +52,11 @@ uint8_t __fastcall__ entity_left_collision(int delta) {
     static uint8_t py, xx;
 
     px = entity_px[cur_index] + delta;
-    px += entity_colx[cur_id][0] << 8;
+    px += entity_colx_x0[cur_id] << 8;
     xx = px >> 8;
     py = entity_py[cur_index] >> 8;
-    if (basic_collision(xx, py + entity_colx[cur_id][1]) ||
-        basic_collision(xx, py + entity_colx[cur_id][3])) {
+    if (basic_collision(xx, py + entity_colx_y0[cur_id]) ||
+        basic_collision(xx, py + entity_colx_y1[cur_id])) {
         return xx & 0xf0;
     }
     return 0;
@@ -66,11 +67,11 @@ uint8_t __fastcall__ entity_right_collision(int delta) {
     static uint8_t py, xx;
 
     px = entity_px[cur_index] + delta;
-    px += entity_colx[cur_id][2] << 8;
+    px += entity_colx_x1[cur_id] << 8;
     xx = px >> 8;
     py = entity_py[cur_index] >> 8;
-    if (basic_collision(xx, py + entity_colx[cur_id][1]) ||
-        basic_collision(xx, py + entity_colx[cur_id][3])) {
+    if (basic_collision(xx, py + entity_colx_y0[cur_id]) ||
+        basic_collision(xx, py + entity_colx_y1[cur_id])) {
         return xx & 0xf0;
     }
     return 0;
@@ -81,11 +82,11 @@ uint8_t __fastcall__ entity_top_collision(int delta) {
     static uint8_t px, yy;
 
     py = entity_py[cur_index] + delta;
-    py += entity_coly[cur_id][1] << 8;
+    py += entity_coly_y0[cur_id] << 8;
     yy = py >> 8;
     px = entity_px[cur_index] >> 8;
-    if (basic_collision(px + entity_coly[cur_id][0], yy) ||
-        basic_collision(px + entity_coly[cur_id][2], yy)) {
+    if (basic_collision(px + entity_coly_x0[cur_id], yy) ||
+        basic_collision(px + entity_coly_x1[cur_id], yy)) {
         return yy & 0xf0;
     }
     return 0;
@@ -96,11 +97,11 @@ uint8_t __fastcall__ entity_bottom_collision(int delta) {
     static uint8_t px, yy;
 
     py = entity_py[cur_index] + delta;
-    py += entity_coly[cur_id][3] << 8;
+    py += entity_coly_y1[cur_id] << 8;
     yy = py >> 8;
     px = entity_px[cur_index] >> 8;
-    if (basic_collision(px + entity_coly[cur_id][0], yy) ||
-        basic_collision(px + entity_coly[cur_id][2], yy)) {
+    if (basic_collision(px + entity_coly_x0[cur_id], yy) ||
+        basic_collision(px + entity_coly_x1[cur_id], yy)) {
         return yy & 0xf0;
     }
     return 0;
@@ -112,26 +113,26 @@ void __fastcall__ entity_compute_position_x(void) {
     if (entity_vx[cur_index] > 0) {
         c = entity_right_collision(entity_vx[cur_index]);
         if (c) {
-            entity_px[cur_index] = (c - entity_colx[cur_id][2]) << 8;
+            entity_px[cur_index] = (c - entity_colx_x1[cur_id]) << 8;
             entity_vx[cur_index] = 0;
         } else {
             entity_px[cur_index] += entity_vx[cur_index];
         }
         c = entity_left_collision(0);
         if (c) {
-            entity_px[cur_index] = (c + 0x10 - entity_colx[cur_id][0]) << 8;
+            entity_px[cur_index] = (c + 0x10 - entity_colx_x0[cur_id]) << 8;
         }
     } else {
         c = entity_left_collision(entity_vx[cur_index]);
         if (c) {
-            entity_px[cur_index] = (c + 0x10 - entity_colx[cur_id][0]) << 8;
+            entity_px[cur_index] = (c + 0x10 - entity_colx_x0[cur_id]) << 8;
             entity_vx[cur_index] = 0;
         } else {
             entity_px[cur_index] += entity_vx[cur_index];
         }
         c = entity_right_collision(0);
         if (c) {
-            entity_px[cur_index] = (c - entity_colx[cur_id][2]) << 8;
+            entity_px[cur_index] = (c - entity_colx_x1[cur_id]) << 8;
         }
     }
 }
@@ -143,7 +144,7 @@ void __fastcall__ entity_compute_position_y(void) {
     if (entity_vy[cur_index] > 0) {
         c = entity_bottom_collision(entity_vy[cur_index]);
         if (c) {
-            entity_py[cur_index] = (c - entity_coly[cur_id][3]) << 8;
+            entity_py[cur_index] = (c - entity_coly_y1[cur_id]) << 8;
             entity_vy[cur_index] = 0;
             entity_on_ground[cur_index] = 1;
         } else {
@@ -151,19 +152,19 @@ void __fastcall__ entity_compute_position_y(void) {
         }
         c = entity_top_collision(0);
         if (c) {
-            entity_py[cur_index] = (c + 0x10 - entity_coly[cur_id][1]) << 8;
+            entity_py[cur_index] = (c + 0x10 - entity_coly_y0[cur_id]) << 8;
         }
     } else {
         c = entity_top_collision(entity_vy[cur_index]);
         if (c) {
-            entity_py[cur_index] = (c + 0x10 - entity_coly[cur_id][1]) << 8;
+            entity_py[cur_index] = (c + 0x10 - entity_coly_y0[cur_id]) << 8;
             entity_vy[cur_index] = 0;
         } else {
             entity_py[cur_index] += entity_vy[cur_index];
         }
         c = entity_bottom_collision(0);
         if (c) {
-            entity_py[cur_index] = (c - entity_coly[cur_id][3]) << 8;
+            entity_py[cur_index] = (c - entity_coly_y1[cur_id]) << 8;
         }
     }
 }
