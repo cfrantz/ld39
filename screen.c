@@ -29,6 +29,7 @@ uint8_t objtable1[16][4] = {
 };
 
 
+#pragma data-name(push, "LEVELDATA")
 uint8_t screen0[16*15] =
 "                "
 "                "
@@ -62,6 +63,7 @@ uint8_t screen[16*15] =
 "F@@@@@@@@@A@@@@F"
 "F@@@@@@@@@A@@@@F"
 "FFFFFFFFFFFFFFFF";
+#pragma data-name(pop)
 
 void copy_to_vram_simple() {
     static uint8_t x, y, i, a, t;
