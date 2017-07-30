@@ -442,8 +442,7 @@ void __fastcall__ entity_update(void) {
     ++entity_anim[cur_index];
     switch(cur_id) {
     case SNAKE:
-        delta = entity_px[0] - entity_px[cur_index];
-        entity_dir[cur_index] = (delta < 0) ? -1 : 1;
+        entity_dir[cur_index] = (entity_px[0] < entity_px[cur_index]) ? -1 : 1;
         if (entity_player_collision()) {
             entity_player_knockback(0x80, 0xF950);
         }
@@ -457,7 +456,7 @@ void __fastcall__ entity_update(void) {
         break;
     case SPIDER:
         // walk towards player
-        delta = entity_px[0] - entity_px[cur_index];
+        delta = (entity_px[0]>>8) - (entity_px[cur_index]>>8);
         if (delta < 0) {
             entity_ax[cur_index] = -0x40;
         } else if (delta > 0) {
