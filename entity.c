@@ -104,7 +104,9 @@ uint8_t player_state;
 uint8_t player_jump;
 uint8_t player_room;
 uint8_t player_rx, player_ry;
-uint8_t player_ckpt_x, player_ckpt_y, player_ckpt_room;
+uint8_t player_ckpt_x, player_ckpt_y;
+uint8_t player_ckpt_rx, player_ckpt_ry;
+uint8_t player_ckpt_room;
 uint8_t player_hit;
 uint8_t player_inv;
 uint8_t player_keys;
@@ -177,7 +179,7 @@ uint8_t __fastcall__ entity_player_collision(void) {
     return !(ex1 < px0 || ey1 < py0 || ex0 > px1 || ey0 > py1);
 }
 
-void __fastcall__ entity_player_knockback(uint16_t ax) {
+void __fastcall__ entity_player_knockback(uint16_t ax, uint16_t dmg) {
     if (!player_inv) {
         if (entity_dir[0] > 0) {
             entity_ax[0] = -ax;
@@ -187,6 +189,7 @@ void __fastcall__ entity_player_knockback(uint16_t ax) {
         entity_ay[0] = -0x180;
         player_inv = 90;
         player_hit = 30;
+        player_energy = bcd_add16(player_energy, dmg);
     }
 }
 
@@ -338,6 +341,7 @@ void __fastcall__ entity_draw(uint8_t index) {
 }
 
 void __fastcall__ entity_draw_stats(void) {
+#if 0
     static uint16_t en;
     spridx = oam_spr(16, 8, 0x0b, 3, spridx);
     spridx = oam_spr(24, 8, 0xe1 + player_keys * 2, 3, spridx);
@@ -352,6 +356,25 @@ void __fastcall__ entity_draw_stats(void) {
     spridx = oam_spr(56, 8, 0xe1 + (en & 0x1E), 3, spridx);
     en >>= 4;
     spridx = oam_spr(48, 8, 0xe1 + (en & 0x1E), 3, spridx);
+#endif
+    extern uint8_t hud[32];
+    static uint8_t val;
+    hud[5] = 0x30 + player_keys;
+
+    val = player_energy;
+    hud[18] = 0x30 + (val & 0x0F); val >>= 4;
+    hud[17] = 0x30 + (val & 0x0F);
+    val = player_energy >> 8;
+    hud[16] = 0x30 + (val & 0x0F); val >>= 4;
+    hud[15] = 0x30 + (val & 0x0F);
+
+    hud[31] = 0x30;
+    val = player_score;
+    hud[30] = 0x30 + (val & 0x0F); val >>= 4;
+    hud[29] = 0x30 + (val & 0x0F); 
+    val = player_score >> 8;
+    hud[28] = 0x30 + (val & 0x0F); val >>= 4;
+    hud[27] = 0x30 + (val & 0x0F);
 }
 
 
@@ -369,6 +392,8 @@ void __fastcall__ entity_set_player(uint8_t x, uint8_t y, uint8_t chkpoint) {
     if (chkpoint) {
         player_ckpt_x = x;
         player_ckpt_y = y;
+        player_ckpt_rx = player_rx;
+        player_ckpt_ry = player_ry;
         player_ckpt_room = player_room;
     }
 }
@@ -420,14 +445,14 @@ void __fastcall__ entity_update(void) {
         delta = entity_px[0] - entity_px[cur_index];
         entity_dir[cur_index] = (delta < 0) ? -1 : 1;
         if (entity_player_collision()) {
-            entity_player_knockback(0x80);
+            entity_player_knockback(0x80, 0xF950);
         }
         break;
     case KEY:
         if (entity_player_collision()) {
             entity_take();
             ++player_keys;
-            player_score += 150;
+            player_score = bcd_add16(player_score, 0x015);
         }
         break;
     case SPIDER:
@@ -441,13 +466,13 @@ void __fastcall__ entity_update(void) {
             entity_ax[cur_index] = 0;
         } 
         if (entity_player_collision()) {
-            entity_player_knockback(0x80);
+            entity_player_knockback(0x80, 0xF925);
         }
         break;
     case GOLD:
         if (entity_player_collision()) {
             entity_take();
-            player_score += 1000;
+            player_score = bcd_add16(player_score, 0x0100);
         }
         break;
     case DOOR:
@@ -477,6 +502,8 @@ void __fastcall__ entity_update(void) {
         if (entity_player_collision()) {
             player_ckpt_x = entity_px[0] >> 8;
             player_ckpt_y = entity_py[0] >> 8;
+            player_ckpt_rx = player_rx;
+            player_ckpt_ry = player_ry;
             player_ckpt_room = player_room;
         }
         break;
@@ -600,7 +627,7 @@ void __fastcall__ entity_check_load_screen(void) {
         entity_load_screen();
     }
     if (yy > 232 && entity_vy[0] > 0) {
-        entity_py[0] = 8;
+        entity_py[0] = 16;
         ++player_ry;
         player_room = levelmap[player_ry*16+player_rx];
         entity_load_screen();
@@ -619,6 +646,8 @@ void __fastcall__ entity_set_screen(uint8_t scrn) {
 }
 
 void __fastcall__ entity_player_checkpoint(void) {
+    player_rx = player_ckpt_rx;
+    player_ry = player_ckpt_ry;
     player_room = player_ckpt_room;
     entity_set_player(player_ckpt_x, player_ckpt_y, false);
     entity_load_screen();

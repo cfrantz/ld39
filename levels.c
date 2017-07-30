@@ -42,7 +42,7 @@ const uint8_t level0[][16*16] = {
 "\x2A\x07\xEA\x01\xA6\x02",
 
 // LVLDAT0 -- screen 1
-"E               "
+"                "
 "E               "
 "E               "
 "E               "
@@ -96,7 +96,7 @@ const uint8_t level0[][16*16] = {
 "\x7D\x05",
 
 // LVLDAT0 -- screen 4
-"               D"
+"                "
 "               D"
 "               D"
 "               D"
@@ -116,6 +116,7 @@ const uint8_t level0[][16*16] = {
 
 
 // LVLDAT0 -- screen 5
+"                "
 "FFFFFFFFFFFFAFFF"
 "FIIIIIIIIIIIAIIF"
 "F@@@@@@@@@@@A@@F"
@@ -126,7 +127,6 @@ const uint8_t level0[][16*16] = {
 "F@@A@@@@@@@@@@@F"
 "F@@A@@@@@@@@@@@F"
 "F@@A@@@@@@@@@@@F"
-"F@@A@@@@@@@@@@@F"
 "FFFFFFFF@@@@@@@F"
 "FFFFFFFFFF@@@@@F"
 "FFFFFFFFFFFF@@@F"
@@ -134,6 +134,7 @@ const uint8_t level0[][16*16] = {
 "",
 
 // LVLDAT0 -- screen 6
+"                "
 "FFFFFFFFFFFFFAFF"
 "FIIIIIIIIIIIIAIF"
 "F@@@@@@@@@@@@A@F"
@@ -148,33 +149,32 @@ const uint8_t level0[][16*16] = {
 "F@@@@@@@@@@@@A@F"
 "FFFFFFFFFFFFFAFF"
 "FFFFFFFFFFFFFAFF"
-"FFFFFFFFFFFFFAFF"
-"\x35\x02\x55\x01\x3B\x06\x6B\x01",
+"\x36\x02\x56\x01\x3C\x06\x6C\x01",
 
 // LVLDAT0 -- screen 7
-"FFFFFFFFFFFFAFFF"
-"FIIIIIIIIIIIAIIF"
-"F@@@@@@@@@@@A@@@"
-"F@@@@@@@@@@@A@@@"
-"F@@@@@@@@@@@A@@@"
-"F@@@@@@@@@@@A@@@"
-"F@@@@@@@@@@@A@@@"
-"F@@@@@@@@@@@A@@@"
-"F@@@@@@@@@@@A@@@"
-"F@@@@@@@@@@@A@@@"
-"F@@@@@@@@@@@A@@@"
-"F@@@@@@@@@@@A@@@"
-"F@@@@@@@@@@@A@@@"
+"                "
+"FFFFFFFFFFFFFAFF"
+"FIIIIIIIIIIIIAIF"
+"F@@@@@@@@@@@@A@@"
+"F@@@@@@@@@@@@A@@"
+"F@@@@@@@@@@@@A@@"
+"F@@@@@@@@@@@@A@@"
+"F@@@@@@@@@@@@A@@"
+"F@@@@@@@@@@@@A@@"
+"F@@@@@@@@@@@@A@@"
+"F@@@@@@@@@@@@A@@"
+"F@@@@@@@@@@@@A@@"
+"F@@@@@@@@@@@@A@@"
 "FFFFFFFFFFFFFFFF"
 "FFFFFFFFFFFFFFFF"
-"\xCC\x04",
+"\x4C\x04",
 
 // LVLDAT0 -- screen 8
+"                "
 "FFFFFFFFFFFFFFFF"
 "FFFFFFFFFFFFFFFF"
 "IIIFFFIIIIFFFIII"
 "@@@III@@@@III@@@"
-"@@@@@@@@@@@@@@@@"
 "@@@@@@@@@@@@@@@@"
 "@@@@@@@@@@@@@@@@"
 "@@@@@@@@@@@@@@@@"
@@ -188,9 +188,9 @@ const uint8_t level0[][16*16] = {
 "",
 
 // LVLDAT0 -- screen 9
+"                "
 "FFFFFFFFFFFFFFFF"
 "IIIIIIIIIIIIIIII"
-"@@@@@@@@@@@@@@@@"
 "@@@@@@@@@@@@@@@@"
 "@@@@@@@@@@@@@@@@"
 "@@@@@@@@@@@@@@@@"
@@ -206,6 +206,7 @@ const uint8_t level0[][16*16] = {
 "",
 
 // LVLDAT0 -- screen 10
+"                "
 "FFFFFFFAFFFFFFFF"
 "IIIIIIIAIIIIIIII"
 "@@@@@@@A@@@@@EEE"
@@ -217,16 +218,15 @@ const uint8_t level0[][16*16] = {
 "@@@@@@@A@@@@@EEE"
 "@@@@@@@A@@@@@EEE"
 "@@@@@@@A@@@@@EEE"
-"@@@@@@@A@@@@@EEE"
 "@@@@@@@A@@@@@@@@"
 "FFFFFFFFFFFFFFFF"
 "FFFFFFFFFFFFFFFF"
 "\xEC\x05",
 
 // LVLDAT0 -- screen 11
+"                "
 "FFFFFFFFFFFFFFFF"
 "EIIIIIIIIIIIIIEE"
-"E@@@@@@@@@@@@@EE"
 "E@@@@@@@@@@@@@EE"
 "E@@@@@@@@@@@@@EE"
 "E@@@@@@@@@@@@@EE"
@@ -242,9 +242,9 @@ const uint8_t level0[][16*16] = {
 "\xCC\x06",
 
 // LVLDAT0 -- screen 12
+"                "
 "FFFFFFFFFFFFFFFF"
 "IIIIIIIIIIIIIIII"
-"@@@@@@@@@@@@@@@@"
 "@@@@@@@@@@@@@@@@"
 "@@@@@@@@@@@@@@@@"
 "@@@@@@@@@@@@@@@@"
@@ -260,9 +260,9 @@ const uint8_t level0[][16*16] = {
 "",
 
 // LVLDAT0 -- screen 13
+"                "
 "FFFFFFFFFFFFFFFF"
 "IIIIIIIIIIIIIIII"
-"@@@@@@@@@@@@@@@@"
 "@@@@@@@@@@@@@@@@"
 "@@@@@@@@@@@@@@@@"
 "@@@@@@@@@@@@@@@@"

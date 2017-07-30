@@ -20,6 +20,8 @@ const unsigned char palette[32]={
 	0x0F, 0x2c, 0x28, 0x30,
 };
 
+uint8_t hud[32] =
+"Keys:0  Energy:0000  Score:00000";
 uint16_t framenum;
 uint8_t player_pad;
 uint8_t player_pad_changed;
@@ -48,7 +50,7 @@ void main(void)
     static uint8_t state;
     bank_bg(0);
     bank_spr(1);
-	set_vram_update(PER_FRAME_PPU_UPDATE_LENGTH, update_list);
+	set_vram_update(32, hud);
 	ppu_off();
 	pal_all(palette);//set palette for sprites
 	oam_size(1);

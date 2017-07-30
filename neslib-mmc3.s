@@ -70,13 +70,10 @@ nmi:
 	ldx <NAME_UPD_LEN
 	beq @skipUpd
 	ldy #0
+    lda #$20
+	sta PPU_ADDR
+	sty PPU_ADDR
 @updName:
-	lda (NAME_UPD_ADR),y
-	iny
-	sta PPU_ADDR
-	lda (NAME_UPD_ADR),y
-	iny
-	sta PPU_ADDR
 	lda (NAME_UPD_ADR),y
 	iny
 	sta PPU_DATA
