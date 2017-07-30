@@ -1,11 +1,11 @@
 #include <stdint.h>
 
 const uint8_t levelmap[16*16] = {
-    0, 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 5, 0, 0, 0,11,12, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 6, 7, 8, 9,10, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,15,14,13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 6, 0, 0, 0,12,13, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 7, 8, 9,10,11, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0,16,15,14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -24,6 +24,24 @@ const char name0[] = "LVLDAT0";
 //const struct Level *level0 = {
 const uint8_t level0[][16*16] = {
 // LVLDAT0 -- screen 0
+"                "
+"                "
+"   EEEEEEEEE    "
+"   E       E    "
+"   E  +,   E    "
+"   E  -./  E    "
+"   E       E    "
+"   EEEEEEEEE    "
+"                "
+"                "
+"                "
+"ggggggggggAggggg"
+"FIIIIIIIIIAIIIIF"
+"F@@@@@@@@@A@@@@F"
+"F@@@@@@@@@A@@@@F"
+"\x2A\x07\xEA\x01\xA6\x02",
+
+// LVLDAT0 -- screen 1
 "E               "
 "E               "
 "E               "
@@ -41,7 +59,7 @@ const uint8_t level0[][16*16] = {
 "FFFFFFFFFFFFFFFF"
 "\x2A\x07\xEA\x01\xA6\x02",
 
-// LVLDAT0 -- screen 1
+// LVLDAT0 -- screen 2
 "                "
 "                "
 "                "
@@ -59,7 +77,7 @@ const uint8_t level0[][16*16] = {
 "FFFFFFFFFFFFFFFF"
 "\x2D\x03\xED\x04",
 
-// LVLDAT0 -- screen 2
+// LVLDAT0 -- screen 3
 "                "
 "                "
 "                "
@@ -77,7 +95,7 @@ const uint8_t level0[][16*16] = {
 "FFFFFFFFFFFFAFFF"
 "\x7D\x05",
 
-// LVLDAT0 -- screen 3
+// LVLDAT0 -- screen 4
 "               D"
 "               D"
 "               D"
@@ -97,7 +115,7 @@ const uint8_t level0[][16*16] = {
 
 
 
-// LVLDAT0 -- screen 4
+// LVLDAT0 -- screen 5
 "FFFFFFFFFFFFAFFF"
 "FIIIIIIIIIIIAIIF"
 "F@@@@@@@@@@@A@@F"
@@ -115,7 +133,7 @@ const uint8_t level0[][16*16] = {
 "FFFFFFFFFFFFFAFF"
 "",
 
-// LVLDAT0 -- screen 5
+// LVLDAT0 -- screen 6
 "FFFFFFFFFFFFFAFF"
 "FIIIIIIIIIIIIAIF"
 "F@@@@@@@@@@@@A@F"
@@ -133,7 +151,7 @@ const uint8_t level0[][16*16] = {
 "FFFFFFFFFFFFFAFF"
 "\x35\x02\x55\x01\x3B\x06\x6B\x01",
 
-// LVLDAT0 -- screen 6
+// LVLDAT0 -- screen 7
 "FFFFFFFFFFFFAFFF"
 "FIIIIIIIIIIIAIIF"
 "F@@@@@@@@@@@A@@@"
@@ -151,7 +169,7 @@ const uint8_t level0[][16*16] = {
 "FFFFFFFFFFFFFFFF"
 "\xCC\x04",
 
-// LVLDAT0 -- screen 7
+// LVLDAT0 -- screen 8
 "FFFFFFFFFFFFFFFF"
 "FFFFFFFFFFFFFFFF"
 "IIIFFFIIIIFFFIII"
@@ -169,7 +187,7 @@ const uint8_t level0[][16*16] = {
 "FFFFFFFFFFFFFFFF"
 "",
 
-// LVLDAT0 -- screen 8
+// LVLDAT0 -- screen 9
 "FFFFFFFFFFFFFFFF"
 "IIIIIIIIIIIIIIII"
 "@@@@@@@@@@@@@@@@"
@@ -187,7 +205,7 @@ const uint8_t level0[][16*16] = {
 "FFFFFFFFFFFAFFFF"
 "",
 
-// LVLDAT0 -- screen 9
+// LVLDAT0 -- screen 10
 "FFFFFFFAFFFFFFFF"
 "IIIIIIIAIIIIIIII"
 "@@@@@@@A@@@@@EEE"
@@ -205,7 +223,7 @@ const uint8_t level0[][16*16] = {
 "FFFFFFFFFFFFFFFF"
 "\xEC\x05",
 
-// LVLDAT0 -- screen 10
+// LVLDAT0 -- screen 11
 "FFFFFFFFFFFFFFFF"
 "EIIIIIIIIIIIIIEE"
 "E@@@@@@@@@@@@@EE"
@@ -223,7 +241,7 @@ const uint8_t level0[][16*16] = {
 "FFFFFFFFFFFFFFFF"
 "\xCC\x06",
 
-// LVLDAT0 -- screen 11
+// LVLDAT0 -- screen 12
 "FFFFFFFFFFFFFFFF"
 "IIIIIIIIIIIIIIII"
 "@@@@@@@@@@@@@@@@"
@@ -241,7 +259,7 @@ const uint8_t level0[][16*16] = {
 "FFFFFFFFFFFFFFFF"
 "",
 
-// LVLDAT0 -- screen 12
+// LVLDAT0 -- screen 13
 "FFFFFFFFFFFFFFFF"
 "IIIIIIIIIIIIIIII"
 "@@@@@@@@@@@@@@@@"

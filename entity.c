@@ -94,7 +94,9 @@ static uint8_t xx, yy;
 //////////////////////////////////////////////////////////////////////
 // The following have player state information
 //////////////////////////////////////////////////////////////////////
-uint8_t player_pad;
+extern uint8_t player_pad;
+extern uint8_t player_pad_changed;;
+extern uint8_t spridx;
 uint8_t player_jump;
 uint8_t player_room;
 uint8_t player_rx, player_ry;;
@@ -104,7 +106,6 @@ uint8_t player_keys;
 uint16_t player_score;
 uint16_t player_energy;
 uint8_t player_etick;
-uint8_t spridx;
 
 uint8_t __fastcall__ entity_left_collision(int16_t delta) {
     xx = (px + delta) >> 8;
@@ -357,6 +358,7 @@ void __fastcall__ entity_set_player(uint8_t x, uint8_t y) {
     entity_px[0] = x<<8;
     entity_py[0] = y<<8;
     entity_on_ground[0] = 1;
+    entity_sprite_id[0] = entity_sprites[0][0];
     player_energy = 0x200;
 }
 
@@ -485,13 +487,11 @@ void __fastcall__ entity_draw_all(void) {
             entity_draw(cur_index);
         }
     }
-    entity_draw_stats();
 }
 
 
 void __fastcall__ entity_player_control(void) {
     static uint8_t on_ladder, a;
-    player_pad = pad_poll(0);
 
     if (++player_etick == 60) {
         player_energy = bcd_add16(player_energy, 0xF999);
@@ -560,23 +560,31 @@ void __fastcall__ entity_check_load_screen(void) {
     if (xx > 248 && entity_vx[0] > 0) {
         entity_px[0] = 0;
         ++player_rx;
+        player_room = levelmap[player_ry*16+player_rx];
         entity_load_screen();
     } else if (xx < 8 && entity_vx[0] < 0) {
         entity_px[0] = 0xFF00;
         --player_rx;
+        player_room = levelmap[player_ry*16+player_rx];
         entity_load_screen();
     }
     if (yy > 232 && entity_vy[0] > 0) {
         entity_py[0] = 8;
         ++player_ry;
+        player_room = levelmap[player_ry*16+player_rx];
         entity_load_screen();
     } else if (yy < 16 && entity_vy[0] < 0) {
         entity_py[0] = 0xE800;
         --player_ry;
+        player_room = levelmap[player_ry*16+player_rx];
         entity_load_screen();
     }
 
     return;
+}
+
+void __fastcall__ entity_set_screen(uint8_t scrn) {
+    player_room = scrn;
 }
 
 void __fastcall__ entity_load_screen(void) {
@@ -584,7 +592,6 @@ void __fastcall__ entity_load_screen(void) {
     ppu_off();
     oam_clear();
     entity_kill_all();
-    player_room = levelmap[player_ry*16+player_rx];
     copy_to_vram_simple(player_room);
 	ppu_on_all();
 

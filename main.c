@@ -26,28 +26,28 @@ uint16_t reg;
 uint16_t framenum;
 uint8_t spr;
 uint8_t a;
-uint8_t dude[] = { 1, 3, 1, 3 };
 
-void chrset() {
-    uint8_t x, y, i;
-    for(y=0; y<16; y++) {
-        for(x=0; x<16; x++) {
-            vram_adr(VADDR(x+8, y+4));
-            vram_put( (y<<4) | x );
-        }
-    }
-	vram_puts(8, 21, __TIME__);
-	vram_puts(0, 32+3, "+------------------------------+");
-	for(i=4; i<28; i++)
-		vram_puts(0, 32+i, "|                              |");
-	vram_puts(0, 32+28, "+------------------------------+");
-                  // 0         1         2         3
-                  // 01234567890123456789012345678901
-    vram_puts(0, 1, "The quick brown fox jumped over_");
-    vram_puts(0, 2, "the lazy dog!___________________");
+uint8_t player_pad;
+uint8_t player_pad_changed;
+uint8_t spridx;
+enum GameMode {
+    TITLE_SCREEN,
+    GAME,
+    PAUSE,
+};
+
+enum GameMode game_state;
+
+void pause(void) {
+    static uint8_t x, y;
+
+    x = 104; y = 6*16;
+    spridx = oam_spr(x, y, 0xd1, 3, spridx); x+= 8;
+    spridx = oam_spr(x, y, 0xd3, 3, spridx); x+= 8;
+    spridx = oam_spr(x, y, 0xd5, 3, spridx); x+= 8;
+    spridx = oam_spr(x, y, 0xd7, 3, spridx); x+= 8;
+    spridx = oam_spr(x, y, 0xd9, 3, spridx);
 }
-
-void __fastcall__ sprite0hit_scroll(void);
 
 void main(void)
 {
@@ -59,30 +59,54 @@ void main(void)
 	oam_size(1);
 
     // Will load the first screen and turn the ppu on
-    entity_load_screen();
-
-    entity_set_player(128, 144);
     //tm = readreg8(0x401b);
-    a = 0;
+    ppu_off();
+    entity_load_screen();
 	for(;;++framenum) {
 		//wait for next TV frame
-        entity_check_load_screen();
 		ppu_waitnmi();
         oam_clear();
-        entity_newframe();
+        player_pad_changed = pad_trigger(0);
+        player_pad = pad_state(0);
 
-        entity_player_control();
-//    tm = readreg8(0x4019);
-        entity_update_all();
-        entity_compute_position(0);
-//    tm = readreg8(0x4019);
-        entity_draw(0);
-        entity_draw_all();
+        switch(game_state) {
+            case TITLE_SCREEN:
+                entity_newframe();
+                entity_set_player(128, 160);
+                entity_update_all();
+                entity_draw(0);
+                entity_draw_all();
 
-#if 0
-        update(0, 1, 'K');
-        update(1, 1, ':');
-        update(2, 1, xdigits[player_keys]);
-#endif
+                if (player_pad_changed & PAD_START) {
+                    game_state = GAME;
+                    ppu_off();
+                    entity_set_screen(1);
+                    entity_load_screen();
+                }
+                break;
+            case GAME:
+                entity_newframe();
+                entity_player_control();
+                // tm = readreg8(0x4019);
+                entity_update_all();
+                entity_compute_position(0);
+                // tm = readreg8(0x4019);
+                entity_draw(0);
+                entity_draw_all();
+                entity_draw_stats();
+                entity_check_load_screen();
+                if (player_pad_changed & PAD_START)
+                    game_state = PAUSE;
+                break;
+            case PAUSE:
+                pause();
+                entity_draw(0);
+                entity_draw_all();
+                if (player_pad_changed & PAD_START)
+                    game_state = GAME;
+                break;
+            default:
+                game_state = GAME;
+        }
     }
 }
