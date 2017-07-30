@@ -15,6 +15,10 @@
 #define writereg16(reg_, val_) ( *(uint16_t*)(reg_) = val_ )
 #define readreg16(reg_)        ( *(uint16_t*)(reg_) )
 
+#define set_mmc3_low_bank(b_) (\
+        writereg8(0x8000, 6), \
+        writereg8(0x8001, b_) )
+
 
 #define dbg_str(val_) xputs(val_)
 

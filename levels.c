@@ -25,9 +25,10 @@ const struct LevelHeader header0 = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     },
-    1,
-    0, 0,
-    64, 160,
+    1,         // start room
+    0, 0,      // start position in the map (above)
+    64, 160,   // pixel location in start room
+    1,         // Next bank
 };
 
 const uint8_t level0[][16*16] = {
@@ -357,17 +358,9 @@ const uint8_t level0[][16*16] = {
 "FFFFFFFFFFFFFFFF"   // E
 "\x28\x09\x28\x03\x8B\x01",
 
-
-
-
-
-
 };
 #pragma rodata-name(pop)
 
-#pragma rodata-name(push, "LVLDAT1")
-const char name1[] = "LVLDAT1";
-#pragma rodata-name(pop)
 #pragma rodata-name(push, "LVLDAT2")
 const char name2[] = "LVLDAT2";
 #pragma rodata-name(pop)
@@ -377,6 +370,4 @@ const char name3[] = "LVLDAT3";
 #pragma rodata-name(push, "LVLDAT4")
 const char name4[] = "LVLDAT4";
 #pragma rodata-name(pop)
-
-
 

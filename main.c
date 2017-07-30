@@ -24,6 +24,7 @@ const unsigned char palette[32]={
 uint8_t hud[32] =
 "Keys:0  Energy:0000  Score:00000";
 uint16_t framenum;
+uint8_t load_bank;
 uint8_t player_pad;
 uint8_t player_pad_changed;
 uint8_t spridx;
@@ -85,6 +86,7 @@ void main(void)
                 }
                 break;
             case LOAD_NEXT:
+                set_mmc3_low_bank(load_bank);
                 my_memcpy(&header, &header0, sizeof(header));
                 player_room = header.start_room;
                 player_rx = header.start_rx;
@@ -104,6 +106,7 @@ void main(void)
                     break;
                 } else if (state == PLAYER_DONE) {
                     if (!entity_player_addpoints()) {
+                        load_bank = header.next_bank;
                         game_state = LOAD_NEXT;
                         break;
                     }

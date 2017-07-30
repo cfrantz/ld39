@@ -295,7 +295,12 @@ void __fastcall__ entity_compute_position(uint8_t entity) {
     }
 
     vx += entity_ax[cur_index];
-    vy += entity_ay[cur_index];
+#if 0
+    // Turn off gravity at the edge of the screen for screen transitions.
+    xx = entity_px[0] >> 8;
+    if (!(xx < 8 || xx > 248))
+#endif
+        vy += entity_ay[cur_index];
 
     if (vx > entity_maxx[cur_id]) {
         vx = entity_maxx[cur_id];
@@ -652,12 +657,12 @@ void __fastcall__ entity_check_load_screen(void) {
     xx = entity_px[0] >> 8;
     yy = entity_py[0] >> 8;
 
-    if (xx > 248 && entity_vx[0] > 0) {
+    if (xx > 248 && (entity_vx[0] > 0 || entity_ax[0] > 0)) {
         entity_px[0] = 0;
         ++player_rx;
         player_room = header.levelmap[player_ry*16+player_rx];
         entity_load_screen();
-    } else if (xx < 8 && entity_vx[0] < 0) {
+    } else if (xx < 8 && (entity_vx[0] < 0 || entity_ax[0] < 0)) {
         entity_px[0] = 0xFF00;
         --player_rx;
         player_room = header.levelmap[player_ry*16+player_rx];

@@ -11,6 +11,7 @@ struct LevelHeader {
     uint8_t start_rx, start_ry;
     // Starting pixel x, y
     uint8_t start_px, start_py;
+    uint8_t next_bank;
 };
 
 extern struct LevelHeader header;
