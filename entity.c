@@ -7,35 +7,42 @@
 //////////////////////////////////////////////////////////////////////
 // The following are parameters indexed on entity id
 // 0: player
-// 1: enemy type 1
-// 2: enemy type 2 (etc)
+// 1: snake
+// 2: gold
+// 3: spider
+// 4: key
 //////////////////////////////////////////////////////////////////////
-const uint8_t entity_palette[] = {  0, 1, 0, 1};
-const uint8_t entity_physics[] = {  1, 0, 0, 1};
+const uint8_t entity_palette[] = {  0, 1, 3, 1, 3};
+const uint8_t entity_physics[] = {  1, 0, 0, 1, 0};
 
-const uint8_t entity_colx_x0[] = {  1, 0,  0, 0,  };
-const uint8_t entity_colx_y0[] = {  2, 2,  0, 2,  };
-const uint8_t entity_colx_x1[] = {  6, 14, 0, 16  };
-const uint8_t entity_colx_y1[] = { 14, 14, 0, 14, };
+const uint8_t entity_colx_x0[] = {  1, 0,  0,  0,  0, };
+const uint8_t entity_colx_y0[] = {  2, 2,  8,  2,  4, };
+const uint8_t entity_colx_x1[] = {  6, 14, 0,  16, 8, };
+const uint8_t entity_colx_y1[] = { 14, 14, 15, 14, 15,};
 
-const uint8_t entity_coly_x0[] = {  2, 0,  0, 2,  };
-const uint8_t entity_coly_y0[] = {  0, 2,  0, 2,  };
-const uint8_t entity_coly_x1[] = {  5, 14, 0, 14, };
-const uint8_t entity_coly_y1[] = { 16, 16, 0, 16, };
+const uint8_t entity_coly_x0[] = {  2, 0,  0,  2,  0, };
+const uint8_t entity_coly_y0[] = {  0, 2,  8,  2,  4, };
+const uint8_t entity_coly_x1[] = {  5, 14, 0,  14, 8, };
+const uint8_t entity_coly_y1[] = { 16, 16, 15, 16, 15, };
 
 const int entity_maxx[] = {
-    0x180, 0x200, 0x0000, 0x100,
+    0x180, 0x200, 0x000, 0x100, 0x000
 };
 
 const int entity_maxy[] = {
-    0x500, 0x500, 0x500, 0x500,
+    0x500, 0x500, 0x000, 0x500, 0x000,
 };
 
 const uint8_t entity_sprites[][4] = {
     { 1, 3, 1, 3 },
     { 0x11, 0x15, 0x11, 0x15 },
-    { 0, 0, 0, 0 },
+    { 0x0b, 0x0b, 0x0b, 0x0b },
     { 0x19, 0x1d, 0x19, 0x1d },
+    { 0x0d, 0x0d, 0x0f, 0x0f },
+};
+
+const uint8_t bittable[8] = {
+    0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01,
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -58,6 +65,10 @@ int8_t entity_dir[MAX_ENTITY];
 uint8_t entity_anim[MAX_ENTITY];
 uint8_t entity_sprite_id[MAX_ENTITY];
 uint8_t entity_sprite_attr[MAX_ENTITY];
+
+#pragma data-name(push, "MORERAM")
+uint8_t entity_taken[256];
+#pragma data-name(pop)
 
 //////////////////////////////////////////////////////////////////////
 // The various collision detection functions in this module use the following
@@ -313,7 +324,6 @@ void __fastcall__ entity_new(uint8_t id, uint8_t x, uint8_t y) {
 
     for(i=1; i<MAX_ENTITY; ++i) {
         if (entity_id[i] == 0) {
-            printf("spawned id=%d in %d\n", id, i);
             entity_id[i] = id;
             entity_ax[i] = 0;
             entity_ay[i] = 0;
@@ -327,6 +337,12 @@ void __fastcall__ entity_new(uint8_t id, uint8_t x, uint8_t y) {
             break;
         }
     }
+}
+
+void __fastcall__ entity_take(void) {
+    xx = entity_px[cur_index] >> 8;
+    entity_taken[player_screen] |= bittable[xx>>5];
+    entity_id[cur_index] = 0;
 }
 
 void __fastcall__ entity_update(void) {
@@ -351,6 +367,11 @@ void __fastcall__ entity_update(void) {
             entity_player_knockback();
         }
         break;
+    case 2:  // key
+        if (entity_player_collision()) {
+            entity_take();
+        }
+        break;
     case 3:  // spider
         // walk towards player
         delta = entity_px[cur_index] - entity_px[0];
@@ -363,6 +384,11 @@ void __fastcall__ entity_update(void) {
         } 
         if (entity_player_collision()) {
             entity_player_knockback();
+        }
+        break;
+    case 4:  // gold
+        if (entity_player_collision()) {
+            entity_take();
         }
         break;
     default: // all others
@@ -479,11 +505,11 @@ void __fastcall__ entity_load_screen(void) {
 
     for(i=0; i<16; i+=2) {
         xx = screen[240+i];
-        printf("enemy: %x\n", xx);
         if (xx) {
             yy = (xx & 0x0F) << 4;
             xx &= 0xF0;
-            entity_new(screen[240+i+1], xx, yy);
+            if (!(entity_taken[player_screen] & bittable[xx>>5]))
+                entity_new(screen[240+i+1], xx, yy);
         }
     }
 }

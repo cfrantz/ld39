@@ -17,7 +17,7 @@ const unsigned char palette[32]={
 	0x0F, 0x02, 0x07, 0x26,
 	0x0F, 0x16, 0x2d, 0x0f,
 	0x0F, 0x02, 0x11, 0x20,
-	0x0F, 0x19, 0x29, 0x39,
+	0x0F, 0x19, 0x28, 0x30,
 };
 
 uint8_t tm;
@@ -68,6 +68,7 @@ void main(void)
 		//wait for next TV frame
         entity_check_load_screen();
 		ppu_waitnmi();
+        oam_clear();
         entity_newframe();
 
         entity_player_control();

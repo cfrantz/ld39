@@ -30,11 +30,9 @@ const uint8_t objtable1[16][4] = {
 };
 
 
-#if 1
 #pragma data-name(push, "MORERAM")
 uint8_t screen[16*16];
 #pragma data-name(pop)
-#endif
 
 void copy_to_vram_simple(int n) {
     static uint8_t x, y, i, a, t;
