@@ -20,13 +20,7 @@ const unsigned char palette[32]={
 	0x0F, 0x2c, 0x28, 0x30,
 };
 
-uint8_t tm;
-uint8_t val;
-uint16_t reg;
 uint16_t framenum;
-uint8_t spr;
-uint8_t a;
-
 uint8_t player_pad;
 uint8_t player_pad_changed;
 uint8_t spridx;
@@ -51,6 +45,7 @@ void pause(void) {
 
 void main(void)
 {
+    static uint8_t state;
     bank_bg(0);
     bank_spr(1);
 	set_vram_update(PER_FRAME_PPU_UPDATE_LENGTH, update_list);
@@ -72,7 +67,7 @@ void main(void)
         switch(game_state) {
             case TITLE_SCREEN:
                 entity_newframe();
-                entity_set_player(128, 160);
+                entity_set_player(128, 160, false);
                 entity_update_all();
                 entity_draw(0);
                 entity_draw_all();
@@ -81,12 +76,17 @@ void main(void)
                     game_state = GAME;
                     ppu_off();
                     entity_set_screen(1);
+                    entity_set_player(128, 160, true);
                     entity_load_screen();
                 }
                 break;
             case GAME:
                 entity_newframe();
-                entity_player_control();
+                state = entity_player_control();
+                if (state == PLAYER_DEAD) {
+                    entity_player_checkpoint();
+                    break;
+                }
                 // tm = readreg8(0x4019);
                 entity_update_all();
                 entity_compute_position(0);

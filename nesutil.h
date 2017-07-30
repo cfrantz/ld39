@@ -4,6 +4,8 @@
 #include "neslib.h"
 
 // Some helpful macros
+#define false       0
+#define true        1
 #define VADDR(x,y)	((0x2000|((y)<<5)|x))
 #define MSB(x)		(((x)>>8))
 #define LSB(x)		(((x)&0xff))

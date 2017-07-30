@@ -25,13 +25,13 @@ const char name0[] = "LVLDAT0";
 const uint8_t level0[][16*16] = {
 // LVLDAT0 -- screen 0
 "                "
-"                "
 "   EEEEEEEEE    "
 "   E       E    "
 "   E  +,   E    "
 "   E  -./  E    "
 "   E       E    "
 "   EEEEEEEEE    "
+"                "
 "                "
 "                "
 "                "

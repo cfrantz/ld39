@@ -21,6 +21,7 @@
 // 6: energy crystal
 // 7: checkpoint 
 //////////////////////////////////////////////////////////////////////
+
 const uint8_t entity_palette[] = {  0, 1, 3, 1, 3, 3, 3, 0};
 const uint8_t entity_physics[] = {  1, 0, 0, 1, 0, 0, 0, 1};
 
@@ -94,12 +95,15 @@ static uint8_t xx, yy;
 //////////////////////////////////////////////////////////////////////
 // The following have player state information
 //////////////////////////////////////////////////////////////////////
+
 extern uint8_t player_pad;
 extern uint8_t player_pad_changed;;
 extern uint8_t spridx;
+uint8_t player_state;
 uint8_t player_jump;
 uint8_t player_room;
-uint8_t player_rx, player_ry;;
+uint8_t player_rx, player_ry;
+uint8_t player_ckpt_x, player_ckpt_y, player_ckpt_room;
 uint8_t player_hit;
 uint8_t player_inv;
 uint8_t player_keys;
@@ -309,7 +313,7 @@ void __fastcall__ entity_draw(uint8_t index) {
     static uint8_t id, sprid, attr;
     id = entity_id[index];
 
-    if (id == 0 && (player_inv & 1))
+    if (id == 0 && (player_inv & 2))
         return;
 
     xx = entity_px[index] >> 8;
@@ -350,7 +354,7 @@ void __fastcall__ entity_draw_stats(void) {
 }
 
 
-void __fastcall__ entity_set_player(uint8_t x, uint8_t y) {
+void __fastcall__ entity_set_player(uint8_t x, uint8_t y, uint8_t chkpoint) {
     entity_ax[0] = 0;
     entity_ay[0] = 0;
     entity_vx[0] = 0;
@@ -360,6 +364,12 @@ void __fastcall__ entity_set_player(uint8_t x, uint8_t y) {
     entity_on_ground[0] = 1;
     entity_sprite_id[0] = entity_sprites[0][0];
     player_energy = 0x200;
+    player_state = PLAYER_ALIVE;
+    if (chkpoint) {
+        player_ckpt_x = x;
+        player_ckpt_y = y;
+        player_ckpt_room = player_room;
+    }
 }
 
 void __fastcall__ entity_new(uint8_t id, uint8_t x, uint8_t y) {
@@ -405,21 +415,21 @@ void __fastcall__ entity_update(void) {
     entity_sprite_id[cur_index] = entity_sprites[cur_id][a];
     ++entity_anim[cur_index];
     switch(cur_id) {
-    case 1:  // snake
+    case SNAKE:
         delta = entity_px[0] - entity_px[cur_index];
         entity_dir[cur_index] = (delta < 0) ? -1 : 1;
         if (entity_player_collision()) {
             entity_player_knockback(0x80);
         }
         break;
-    case 2:  // key
+    case KEY:
         if (entity_player_collision()) {
             entity_take();
             ++player_keys;
             player_score += 150;
         }
         break;
-    case 3:  // spider
+    case SPIDER:
         // walk towards player
         delta = entity_px[0] - entity_px[cur_index];
         if (delta < 0) {
@@ -433,13 +443,13 @@ void __fastcall__ entity_update(void) {
             entity_player_knockback(0x80);
         }
         break;
-    case 4:  // gold
+    case GOLD:
         if (entity_player_collision()) {
             entity_take();
             player_score += 1000;
         }
         break;
-    case 5:  // door
+    case DOOR:
         if (entity_player_collision()) {
             if (player_keys) {
                 entity_take();
@@ -456,12 +466,20 @@ void __fastcall__ entity_update(void) {
             }
         }
         break;
-    case 6:  // crystal
+    case CRYSTAL:
         if (entity_player_collision()) {
             entity_take();
             player_energy = bcd_add16(player_energy, 0x0120);
         }
         break;
+    case CHECKPOINT:
+        if (entity_player_collision()) {
+            player_ckpt_x = entity_px[0] >> 8;
+            player_ckpt_y = entity_py[0] >> 8;
+            player_ckpt_room = player_room;
+        }
+        break;
+
     default: // all others
         ;
     }
@@ -490,17 +508,28 @@ void __fastcall__ entity_draw_all(void) {
 }
 
 
-void __fastcall__ entity_player_control(void) {
+uint8_t __fastcall__ entity_player_control(void) {
     static uint8_t on_ladder, a;
 
-    if (++player_etick == 60) {
+    if (player_energy==0 || player_energy & 0x8000) {
+        if (player_state == PLAYER_ALIVE) {
+            player_energy = 0;
+            player_hit = player_inv = 180;
+            entity_sprite_id[0] = 0x07;
+            entity_ax[0] = 0;
+            entity_ay[0] = 0;
+            entity_vx[0] = 0;
+            entity_vy[0] = 0;
+            player_state = PLAYER_DEAD;
+        }
+    } else if (++player_etick == 60) {
         player_energy = bcd_add16(player_energy, 0xF999);
         player_etick = 0;
     }
     if (player_inv) --player_inv;
     if (player_hit) {
         --player_hit;
-        return;
+        return PLAYER_ALIVE;
     }
     a = (entity_anim[0] / 4) & 3;
     entity_sprite_attr[0] = (entity_dir[0] < 0) ? 0x40 : 0;
@@ -551,6 +580,7 @@ void __fastcall__ entity_player_control(void) {
     } else {
         if (player_jump) player_jump = 0;
     }
+    return player_state;
 }
 
 void __fastcall__ entity_check_load_screen(void) {
@@ -585,6 +615,12 @@ void __fastcall__ entity_check_load_screen(void) {
 
 void __fastcall__ entity_set_screen(uint8_t scrn) {
     player_room = scrn;
+}
+
+void __fastcall__ entity_player_checkpoint(void) {
+    player_room = player_ckpt_room;
+    entity_set_player(player_ckpt_x, player_ckpt_y, false);
+    entity_load_screen();
 }
 
 void __fastcall__ entity_load_screen(void) {
