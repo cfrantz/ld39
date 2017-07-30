@@ -19,36 +19,38 @@
 // 4: gold
 // 5: locked door
 // 6: energy crystal
+// 7: checkpoint 
 //////////////////////////////////////////////////////////////////////
-const uint8_t entity_palette[] = {  0, 1, 3, 1, 3, 3, 3};
-const uint8_t entity_physics[] = {  1, 0, 0, 1, 0, 0, 0};
+const uint8_t entity_palette[] = {  0, 1, 3, 1, 3, 3, 3, 0};
+const uint8_t entity_physics[] = {  1, 0, 0, 1, 0, 0, 0, 1};
 
-const uint8_t entity_colx_x0[] = {  1, 0,  0,  0,  0,  0,  0};
-const uint8_t entity_colx_y0[] = {  2, 2,  8,  2,  4,  0,  1};
-const uint8_t entity_colx_x1[] = {  6, 14, 0,  16, 8,  15, 8};
-const uint8_t entity_colx_y1[] = { 14, 14, 15, 14, 15, 15, 14};
+const uint8_t entity_colx_x0[] = {  1, 0,  0,  0,  0,  0,  0, 0};
+const uint8_t entity_colx_y0[] = {  2, 2,  8,  2,  4,  0,  1, 0};
+const uint8_t entity_colx_x1[] = {  6, 14, 0,  16, 8,  15, 8, 15};
+const uint8_t entity_colx_y1[] = { 14, 14, 15, 14, 15, 15, 14, 15};
 
-const uint8_t entity_coly_x0[] = {  2, 0,  0,  2,  0,  0,  0};
-const uint8_t entity_coly_y0[] = {  0, 2,  8,  2,  4,  0,  1};
-const uint8_t entity_coly_x1[] = {  5, 14, 0,  14, 8,  15, 8};
-const uint8_t entity_coly_y1[] = { 16, 16, 15, 16, 15, 15, 14};
+const uint8_t entity_coly_x0[] = {  2, 0,  0,  2,  0,  0,  0,  0};
+const uint8_t entity_coly_y0[] = {  0, 2,  8,  2,  4,  0,  1,  0};
+const uint8_t entity_coly_x1[] = {  5, 14, 0,  14, 8,  15, 8,  15};
+const uint8_t entity_coly_y1[] = { 16, 16, 15, 16, 15, 15, 14, 15};
 
 const int entity_maxx[] = {
-    0x180, 0x200, 0x000, 0x100, 0x000, 0x000, 0x000,
+    0x180, 0x200, 0x000, 0x100, 0x000, 0x000, 0x000, 0x000,
 };
 
 const int entity_maxy[] = {
-    0x500, 0x500, 0x000, 0x500, 0x000, 0x000, 0x000,
+    0x500, 0x500, 0x000, 0x500, 0x000, 0x000, 0x000, 0x000,
 };
 
 const uint8_t entity_sprites[][4] = {
     { 1, 3, 1, 3 },
     { 0x11, 0x15, 0x11, 0x15 },
     { 0x0b, 0x0b, 0x0b, 0x0b },
-    { 0x19, 0x1d, 0x19, 0x1d },
+    { 0x19, 0x19, 0x1d, 0x1d },
     { 0x0d, 0x0d, 0x0f, 0x0f },
     { 0x21, 0x21, 0x21, 0x21 },
     { 0x25, 0x25, 0x27, 0x27 },
+    { 0x29, 0x29, 0x29, 0x29 },
 };
 
 const uint8_t bittable[8] = {
@@ -402,6 +404,8 @@ void __fastcall__ entity_update(void) {
     ++entity_anim[cur_index];
     switch(cur_id) {
     case 1:  // snake
+        delta = entity_px[0] - entity_px[cur_index];
+        entity_dir[cur_index] = (delta < 0) ? -1 : 1;
         if (entity_player_collision()) {
             entity_player_knockback(0x80);
         }
@@ -415,11 +419,11 @@ void __fastcall__ entity_update(void) {
         break;
     case 3:  // spider
         // walk towards player
-        delta = entity_px[cur_index] - entity_px[0];
+        delta = entity_px[0] - entity_px[cur_index];
         if (delta < 0) {
-            entity_ax[cur_index] = 0x40;
-        } else if (delta > 0) {
             entity_ax[cur_index] = -0x40;
+        } else if (delta > 0) {
+            entity_ax[cur_index] = 0x40;
         } else {
             entity_ax[cur_index] = 0;
         } 
@@ -441,11 +445,11 @@ void __fastcall__ entity_update(void) {
             } else {
                 delta = entity_px[cur_index] - entity_px[0];
                 if (delta < 0) {
-                    // Door is to left of player
-                    entity_ax[0] = 0x40;
-                } else {
                     // Door is to right of player
                     entity_ax[0] = -0x40;
+                } else {
+                    // Door is to left of player
+                    entity_ax[0] = 0x40;
                 }
             }
         }
