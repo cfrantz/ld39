@@ -11,11 +11,14 @@ enum EntityType {
     DOOR,
     CRYSTAL,
     CHECKPOINT,
+    UNKNOWN_8,
+    ENDPOINT,
 };
 
 enum PlayerState {
     PLAYER_ALIVE,
     PLAYER_DEAD,
+    PLAYER_DONE,
 };
 
 void __fastcall__ entity_newframe(void);

@@ -26,10 +26,14 @@ uint16_t framenum;
 uint8_t player_pad;
 uint8_t player_pad_changed;
 uint8_t spridx;
+uint8_t player_room;
+uint8_t player_rx, player_ry;
+
 enum GameMode {
     TITLE_SCREEN,
     GAME,
     PAUSE,
+    LOAD_NEXT,
 };
 
 enum GameMode game_state;
@@ -75,12 +79,15 @@ void main(void)
                 entity_draw_all();
 
                 if (player_pad_changed & PAD_START) {
-                    game_state = GAME;
-                    ppu_off();
-                    entity_set_screen(1);
-                    entity_set_player(128, 160, true);
-                    entity_load_screen();
+                    game_state = LOAD_NEXT;
                 }
+                break;
+            case LOAD_NEXT:
+                ppu_off();
+                entity_set_screen(1);
+                entity_set_player(64, 160, true);
+                entity_load_screen();
+                game_state = GAME;
                 break;
             case GAME:
                 entity_newframe();

@@ -20,28 +20,30 @@
 // 5: locked door
 // 6: energy crystal
 // 7: checkpoint 
+// 8: ??? 
+// 9: endpoint
 //////////////////////////////////////////////////////////////////////
 
-const uint8_t entity_palette[] = {  0, 1, 3, 1, 3, 3, 3, 0};
-const uint8_t entity_physics[] = {  1, 0, 0, 1, 0, 0, 0, 1};
+const uint8_t entity_palette[] = {  0, 1, 3, 1, 3, 3, 3, 0, 0, 1,};
+const uint8_t entity_physics[] = {  1, 0, 0, 1, 0, 0, 0, 1, 0, 0,};
 
-//                                  0  1   2   3   4   5   6   7
-const uint8_t entity_colx_x0[] = {  1, 0,  0,  0,  0,  0,  0,  0};
-const uint8_t entity_colx_y0[] = {  2, 2,  8,  2,  4,  0,  1,  0};
-const uint8_t entity_colx_x1[] = {  6, 14, 0,  16, 8,  16, 8,  15};
-const uint8_t entity_colx_y1[] = { 14, 14, 15, 14, 15, 16, 14, 15};
+//                                  0  1   2   3   4   5   6   7   8   9
+const uint8_t entity_colx_x0[] = {  1, 0,  0,  0,  0,  0,  0,  0,  0,  0, };
+const uint8_t entity_colx_y0[] = {  2, 2,  8,  2,  4,  0,  1,  0,  0,  0, };
+const uint8_t entity_colx_x1[] = {  6, 14, 0,  16, 8,  16, 8,  15, 0,  15, };
+const uint8_t entity_colx_y1[] = { 14, 14, 15, 14, 15, 16, 14, 15, 0,  15, };
 
-const uint8_t entity_coly_x0[] = {  2, 0,  0,  2,  0,  1,  0,  0};
-const uint8_t entity_coly_y0[] = {  0, 2,  8,  2,  4,  1,  1,  0};
-const uint8_t entity_coly_x1[] = {  5, 14, 0,  14, 8,  15, 8,  15};
-const uint8_t entity_coly_y1[] = { 16, 16, 15, 16, 15, 15, 14, 15};
+const uint8_t entity_coly_x0[] = {  2, 0,  0,  2,  0,  1,  0,  0,  0,  0, };
+const uint8_t entity_coly_y0[] = {  0, 2,  8,  2,  4,  1,  1,  0,  0,  0, };
+const uint8_t entity_coly_x1[] = {  5, 14, 0,  14, 8,  15, 8,  15, 0,  15, };
+const uint8_t entity_coly_y1[] = { 16, 16, 15, 16, 15, 15, 14, 15, 0,  15, };
 
 const int entity_maxx[] = {
-    0x180, 0x200, 0x000, 0x100, 0x000, 0x000, 0x000, 0x000,
+    0x180, 0x200, 0x000, 0x100, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000,
 };
 
 const int entity_maxy[] = {
-    0x500, 0x500, 0x000, 0x500, 0x000, 0x000, 0x000, 0x000,
+    0x500, 0x500, 0x000, 0x500, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000,
 };
 
 const uint8_t entity_sprites[][4] = {
@@ -52,6 +54,8 @@ const uint8_t entity_sprites[][4] = {
     { 0x0d, 0x0d, 0x0f, 0x0f },
     { 0x21, 0x21, 0x21, 0x21 },
     { 0x25, 0x25, 0x27, 0x27 },
+    { 0x29, 0x29, 0x29, 0x29 },
+    { 0, 0, 0, 0 },
     { 0x29, 0x29, 0x29, 0x29 },
 };
 
@@ -100,10 +104,10 @@ static uint8_t xx, yy;
 extern uint8_t player_pad;
 extern uint8_t player_pad_changed;;
 extern uint8_t spridx;
+extern uint8_t player_room;
+extern uint8_t player_rx, player_ry;
 uint8_t player_state;
 uint8_t player_jump;
-uint8_t player_room;
-uint8_t player_rx, player_ry;
 uint8_t player_ckpt_x, player_ckpt_y;
 uint8_t player_ckpt_rx, player_ckpt_ry;
 uint8_t player_ckpt_room;
@@ -504,6 +508,11 @@ void __fastcall__ entity_update(void) {
             player_ckpt_rx = player_rx;
             player_ckpt_ry = player_ry;
             player_ckpt_room = player_room;
+        }
+        break;
+    case ENDPOINT:
+        if (entity_player_collision()) {
+            player_state = PLAYER_DONE;
         }
         break;
 
