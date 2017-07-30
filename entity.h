@@ -15,4 +15,6 @@ void __fastcall__ entity_draw_all(void);
 void __fastcall__ entity_check_load_screen(void);
 void __fastcall__ entity_load_screen(void);
 
+extern uint8_t player_keys;
+
 #endif // LD39_ENTITY_H

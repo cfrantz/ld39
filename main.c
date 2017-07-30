@@ -17,7 +17,7 @@ const unsigned char palette[32]={
 	0x0F, 0x02, 0x07, 0x26,
 	0x0F, 0x16, 0x2d, 0x0f,
 	0x0F, 0x02, 0x11, 0x20,
-	0x0F, 0x19, 0x28, 0x30,
+	0x0F, 0x2c, 0x28, 0x30,
 };
 
 uint8_t tm;
@@ -72,23 +72,17 @@ void main(void)
         entity_newframe();
 
         entity_player_control();
-    tm = readreg8(0x4019);
+//    tm = readreg8(0x4019);
         entity_update_all();
         entity_compute_position(0);
-    tm = readreg8(0x4019);
+//    tm = readreg8(0x4019);
         entity_draw(0);
         entity_draw_all();
 
 #if 0
-        if ((framenum & 7) == 0) {
-            if (++a == 4) a = 0;
-        }
-        spr = oam_spr(20, 40, dude[a], 0, spr);
-        val = spr;
-
-        update_reset();
-        update(0, 10, xdigits[(uint8_t)framenum >> 4]);
-        update(1, 10, xdigits[(uint8_t)framenum & 15]);
+        update(0, 1, 'K');
+        update(1, 1, ':');
+        update(2, 1, xdigits[player_keys]);
 #endif
     }
 }

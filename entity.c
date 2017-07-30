@@ -1,36 +1,44 @@
 #include <stdio.h>
 #include <stdint.h>
+#include "bcd.h"
 #include "entity.h"
+#include "levels.h"
 #include "screen.h"
 #include "nesutil.h"
 
 //////////////////////////////////////////////////////////////////////
 // The following are parameters indexed on entity id
+//
+// Even ids are 8x16 sprites
+// Odd ids are 16x16 sprites
+//
 // 0: player
 // 1: snake
-// 2: gold
+// 2: key
 // 3: spider
-// 4: key
+// 4: gold
+// 5: locked door
+// 6: energy crystal
 //////////////////////////////////////////////////////////////////////
-const uint8_t entity_palette[] = {  0, 1, 3, 1, 3};
-const uint8_t entity_physics[] = {  1, 0, 0, 1, 0};
+const uint8_t entity_palette[] = {  0, 1, 3, 1, 3, 3, 3};
+const uint8_t entity_physics[] = {  1, 0, 0, 1, 0, 0, 0};
 
-const uint8_t entity_colx_x0[] = {  1, 0,  0,  0,  0, };
-const uint8_t entity_colx_y0[] = {  2, 2,  8,  2,  4, };
-const uint8_t entity_colx_x1[] = {  6, 14, 0,  16, 8, };
-const uint8_t entity_colx_y1[] = { 14, 14, 15, 14, 15,};
+const uint8_t entity_colx_x0[] = {  1, 0,  0,  0,  0,  0,  0};
+const uint8_t entity_colx_y0[] = {  2, 2,  8,  2,  4,  0,  1};
+const uint8_t entity_colx_x1[] = {  6, 14, 0,  16, 8,  15, 8};
+const uint8_t entity_colx_y1[] = { 14, 14, 15, 14, 15, 15, 14};
 
-const uint8_t entity_coly_x0[] = {  2, 0,  0,  2,  0, };
-const uint8_t entity_coly_y0[] = {  0, 2,  8,  2,  4, };
-const uint8_t entity_coly_x1[] = {  5, 14, 0,  14, 8, };
-const uint8_t entity_coly_y1[] = { 16, 16, 15, 16, 15, };
+const uint8_t entity_coly_x0[] = {  2, 0,  0,  2,  0,  0,  0};
+const uint8_t entity_coly_y0[] = {  0, 2,  8,  2,  4,  0,  1};
+const uint8_t entity_coly_x1[] = {  5, 14, 0,  14, 8,  15, 8};
+const uint8_t entity_coly_y1[] = { 16, 16, 15, 16, 15, 15, 14};
 
 const int entity_maxx[] = {
-    0x180, 0x200, 0x000, 0x100, 0x000
+    0x180, 0x200, 0x000, 0x100, 0x000, 0x000, 0x000,
 };
 
 const int entity_maxy[] = {
-    0x500, 0x500, 0x000, 0x500, 0x000,
+    0x500, 0x500, 0x000, 0x500, 0x000, 0x000, 0x000,
 };
 
 const uint8_t entity_sprites[][4] = {
@@ -39,6 +47,8 @@ const uint8_t entity_sprites[][4] = {
     { 0x0b, 0x0b, 0x0b, 0x0b },
     { 0x19, 0x1d, 0x19, 0x1d },
     { 0x0d, 0x0d, 0x0f, 0x0f },
+    { 0x21, 0x21, 0x21, 0x21 },
+    { 0x25, 0x25, 0x27, 0x27 },
 };
 
 const uint8_t bittable[8] = {
@@ -84,9 +94,14 @@ static uint8_t xx, yy;
 //////////////////////////////////////////////////////////////////////
 uint8_t player_pad;
 uint8_t player_jump;
-uint8_t player_screen;
+uint8_t player_room;
+uint8_t player_rx, player_ry;;
 uint8_t player_hit;
 uint8_t player_inv;
+uint8_t player_keys;
+uint16_t player_score;
+uint16_t player_energy;
+uint8_t player_etick;
 uint8_t spridx;
 
 uint8_t __fastcall__ entity_left_collision(int16_t delta) {
@@ -154,13 +169,14 @@ uint8_t __fastcall__ entity_player_collision(void) {
     return !(ex1 < px0 || ey1 < py0 || ex0 > px1 || ey0 > py1);
 }
 
-void __fastcall__ entity_player_knockback(void) {
+void __fastcall__ entity_player_knockback(uint16_t ax) {
     if (!player_inv) {
         if (entity_dir[0] > 0) {
-            entity_ax[0] = -0x80;
+            entity_ax[0] = -ax;
         } else {
-            entity_ax[0] = 0x80;
+            entity_ax[0] = ax;
         }
+        entity_ay[0] = -0x180;
         player_inv = 90;
         player_hit = 30;
     }
@@ -289,6 +305,10 @@ void __fastcall__ entity_newframe(void) {
 void __fastcall__ entity_draw(uint8_t index) {
     static uint8_t id, sprid, attr;
     id = entity_id[index];
+
+    if (id == 0 && (player_inv & 1))
+        return;
+
     xx = entity_px[index] >> 8;
     yy = entity_py[index] >> 8;
     sprid = entity_sprite_id[index];
@@ -309,6 +329,24 @@ void __fastcall__ entity_draw(uint8_t index) {
 
 }
 
+void __fastcall__ entity_draw_stats(void) {
+    static uint16_t en;
+    spridx = oam_spr(16, 8, 0x0b, 3, spridx);
+    spridx = oam_spr(24, 8, 0xe1 + player_keys * 2, 3, spridx);
+
+
+    en = player_energy;
+    spridx = oam_spr(40, 8, 0x25, 3, spridx);
+    spridx = oam_spr(72, 8, 0xe1 + (en & 0x0F) * 2, 3, spridx);
+    en >>= 3;
+    spridx = oam_spr(64, 8, 0xe1 + (en & 0x1E), 3, spridx);
+    en >>= 4;
+    spridx = oam_spr(56, 8, 0xe1 + (en & 0x1E), 3, spridx);
+    en >>= 4;
+    spridx = oam_spr(48, 8, 0xe1 + (en & 0x1E), 3, spridx);
+}
+
+
 void __fastcall__ entity_set_player(uint8_t x, uint8_t y) {
     entity_ax[0] = 0;
     entity_ay[0] = 0;
@@ -317,6 +355,7 @@ void __fastcall__ entity_set_player(uint8_t x, uint8_t y) {
     entity_px[0] = x<<8;
     entity_py[0] = y<<8;
     entity_on_ground[0] = 1;
+    player_energy = 0x200;
 }
 
 void __fastcall__ entity_new(uint8_t id, uint8_t x, uint8_t y) {
@@ -341,7 +380,7 @@ void __fastcall__ entity_new(uint8_t id, uint8_t x, uint8_t y) {
 
 void __fastcall__ entity_take(void) {
     xx = entity_px[cur_index] >> 8;
-    entity_taken[player_screen] |= bittable[xx>>5];
+    entity_taken[player_room] |= bittable[xx>>5];
     entity_id[cur_index] = 0;
 }
 
@@ -364,12 +403,14 @@ void __fastcall__ entity_update(void) {
     switch(cur_id) {
     case 1:  // snake
         if (entity_player_collision()) {
-            entity_player_knockback();
+            entity_player_knockback(0x80);
         }
         break;
     case 2:  // key
         if (entity_player_collision()) {
             entity_take();
+            ++player_keys;
+            player_score += 150;
         }
         break;
     case 3:  // spider
@@ -383,12 +424,36 @@ void __fastcall__ entity_update(void) {
             entity_ax[cur_index] = 0;
         } 
         if (entity_player_collision()) {
-            entity_player_knockback();
+            entity_player_knockback(0x80);
         }
         break;
     case 4:  // gold
         if (entity_player_collision()) {
             entity_take();
+            player_score += 1000;
+        }
+        break;
+    case 5:  // door
+        if (entity_player_collision()) {
+            if (player_keys) {
+                entity_take();
+                --player_keys;
+            } else {
+                delta = entity_px[cur_index] - entity_px[0];
+                if (delta < 0) {
+                    // Door is to left of player
+                    entity_ax[0] = 0x40;
+                } else {
+                    // Door is to right of player
+                    entity_ax[0] = -0x40;
+                }
+            }
+        }
+        break;
+    case 6:  // crystal
+        if (entity_player_collision()) {
+            entity_take();
+            player_energy = bcd_add16(player_energy, 0x0120);
         }
         break;
     default: // all others
@@ -416,6 +481,7 @@ void __fastcall__ entity_draw_all(void) {
             entity_draw(cur_index);
         }
     }
+    entity_draw_stats();
 }
 
 
@@ -423,6 +489,10 @@ void __fastcall__ entity_player_control(void) {
     static uint8_t on_ladder, a;
     player_pad = pad_poll(0);
 
+    if (++player_etick == 60) {
+        player_energy = bcd_add16(player_energy, 0xF999);
+        player_etick = 0;
+    }
     if (player_inv) --player_inv;
     if (player_hit) {
         --player_hit;
@@ -485,13 +555,23 @@ void __fastcall__ entity_check_load_screen(void) {
 
     if (xx > 248 && entity_vx[0] > 0) {
         entity_px[0] = 0;
-        ++player_screen;
+        ++player_rx;
         entity_load_screen();
     } else if (xx < 8 && entity_vx[0] < 0) {
         entity_px[0] = 0xFF00;
-        --player_screen;
+        --player_rx;
         entity_load_screen();
     }
+    if (yy > 232 && entity_vy[0] > 0) {
+        entity_py[0] = 8;
+        ++player_ry;
+        entity_load_screen();
+    } else if (yy < 16 && entity_vy[0] < 0) {
+        entity_py[0] = 0xE800;
+        --player_ry;
+        entity_load_screen();
+    }
+
     return;
 }
 
@@ -500,7 +580,8 @@ void __fastcall__ entity_load_screen(void) {
     ppu_off();
     oam_clear();
     entity_kill_all();
-    copy_to_vram_simple(player_screen);
+    player_room = levelmap[player_ry*16+player_rx];
+    copy_to_vram_simple(player_room);
 	ppu_on_all();
 
     for(i=0; i<16; i+=2) {
@@ -508,7 +589,7 @@ void __fastcall__ entity_load_screen(void) {
         if (xx) {
             yy = (xx & 0x0F) << 4;
             xx &= 0xF0;
-            if (!(entity_taken[player_screen] & bittable[xx>>5]))
+            if (!(entity_taken[player_room] & bittable[xx>>5]))
                 entity_new(screen[240+i+1], xx, yy);
         }
     }
