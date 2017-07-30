@@ -25,13 +25,14 @@
 const uint8_t entity_palette[] = {  0, 1, 3, 1, 3, 3, 3, 0};
 const uint8_t entity_physics[] = {  1, 0, 0, 1, 0, 0, 0, 1};
 
-const uint8_t entity_colx_x0[] = {  1, 0,  0,  0,  0,  0,  0, 0};
-const uint8_t entity_colx_y0[] = {  2, 2,  8,  2,  4,  0,  1, 0};
-const uint8_t entity_colx_x1[] = {  6, 14, 0,  16, 8,  15, 8, 15};
-const uint8_t entity_colx_y1[] = { 14, 14, 15, 14, 15, 15, 14, 15};
+//                                  0  1   2   3   4   5   6   7
+const uint8_t entity_colx_x0[] = {  1, 0,  0,  0,  0,  0,  0,  0};
+const uint8_t entity_colx_y0[] = {  2, 2,  8,  2,  4,  0,  1,  0};
+const uint8_t entity_colx_x1[] = {  6, 14, 0,  16, 8,  16, 8,  15};
+const uint8_t entity_colx_y1[] = { 14, 14, 15, 14, 15, 16, 14, 15};
 
-const uint8_t entity_coly_x0[] = {  2, 0,  0,  2,  0,  0,  0,  0};
-const uint8_t entity_coly_y0[] = {  0, 2,  8,  2,  4,  0,  1,  0};
+const uint8_t entity_coly_x0[] = {  2, 0,  0,  2,  0,  1,  0,  0};
+const uint8_t entity_coly_y0[] = {  0, 2,  8,  2,  4,  1,  1,  0};
 const uint8_t entity_coly_x1[] = {  5, 14, 0,  14, 8,  15, 8,  15};
 const uint8_t entity_coly_y1[] = { 16, 16, 15, 16, 15, 15, 14, 15};
 
@@ -455,13 +456,13 @@ void __fastcall__ entity_update(void) {
                 entity_take();
                 --player_keys;
             } else {
-                delta = entity_px[cur_index] - entity_px[0];
+                delta = entity_px[0] - entity_px[cur_index];
                 if (delta < 0) {
-                    // Door is to right of player
-                    entity_ax[0] = -0x40;
+                    // Player is left of door
+                    entity_px[0] = entity_px[cur_index] - 0x800;
                 } else {
-                    // Door is to left of player
-                    entity_ax[0] = 0x40;
+                    // Player is right of door
+                    entity_px[0] = entity_px[cur_index] + 0xF00;
                 }
             }
         }
