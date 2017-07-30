@@ -1,6 +1,13 @@
 #include <stdint.h>
+#include "levels.h"
 
-const uint8_t levelmap[16*16] = {
+#pragma bss-name(push, "MORERAM")
+struct LevelHeader header;
+#pragma bss-name(pop)
+
+#pragma rodata-name(push, "LVLDAT0")
+const struct LevelHeader header0 = {
+    "Level 1", {
     1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 6, 0, 0,12,13, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -17,10 +24,11 @@ const uint8_t levelmap[16*16] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    },
+    1,
+    0, 0,
+    64, 160,
 };
-
-#pragma rodata-name(push, "LVLDAT0")
-const char name0[] = "LVLDAT0";
 
 const uint8_t level0[][16*16] = {
 // LVLDAT0 -- screen 0
@@ -288,12 +296,12 @@ const uint8_t level0[][16*16] = {
 "FFFFFFFFFFFAFFFF"   // 7
 "FFFFFFFFFFFAFFFF"   // 8
 "IIIIIIIIIIIAIIIF"   // 9
-"@@@@@@@@@@@A@@@F"   // A
-"@@@@@@@@@@@A@@@F"   // B
+"@@@E@@@@@@@A@@@F"   // A
+"@@@E@@@@@@@A@@@F"   // B
 "@@@@@@@@@@@A@@@F"   // C
 "FFFFFFFFFFFFFFFF"   // D
 "FFFFFFFFFFFFFFFF"   // E
-"",
+"\x3C\x05",
 
 // LVLDAT0 -- screen 15
 "                "   // 0
@@ -320,8 +328,8 @@ const uint8_t level0[][16*16] = {
 "E@@@@@@@@@@@@@@@"   // 3
 "E@@@@@@@@@@@@@@@"   // 4
 "EEAEEEEEEEEEEEEE"   // 5
-"E@A@@@EE@@@@@@@@"   // 6
-"E@A@@@EE@@@@@@@@"   // 7
+"E@A@@@EE@@@@@E@@"   // 6
+"E@A@@@EE@@@@@E@@"   // 7
 "E@A@@@EE@@@@@@@@"   // 8
 "E@A@@@EEAEEEEEEE"   // 9
 "E@A@@@EEA@@@@@@@"   // A
@@ -329,7 +337,7 @@ const uint8_t level0[][16*16] = {
 "@@A@@@EEA@@@@@@@"   // C
 "FFFFFFFFFFFFFFFF"   // D
 "FFFFFFFFFFFFFFFF"   // E
-"\x44\x03",
+"\x44\x03\xD8\x05",
 
 // LVLDAT0 -- screen 17
 "                "   // 0

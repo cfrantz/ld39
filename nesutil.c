@@ -39,3 +39,11 @@ void __fastcall__ vram_puts(unsigned char x, unsigned char y, const char *str)
 	}
 }
 
+void __fastcall__ my_memcpy(void *dst, void *src, int len) {
+    uint8_t *d = (uint8_t*)dst;
+    uint8_t *s = (uint8_t*)src;
+    while(len) {
+        *d = *s;
+        ++d; ++s; --len;
+    }
+}

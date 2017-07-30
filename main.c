@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include "nesutil.h"
+#include "levels.h"
 #include "screen.h"
 #include "entity.h"
 
@@ -62,6 +63,7 @@ void main(void)
     // Will load the first screen and turn the ppu on
     //tm = readreg8(0x401b);
     ppu_off();
+    my_memcpy(&header, &header0, sizeof(header));
     entity_load_screen();
 	for(;;++framenum) {
 		//wait for next TV frame
@@ -83,9 +85,14 @@ void main(void)
                 }
                 break;
             case LOAD_NEXT:
+                my_memcpy(&header, &header0, sizeof(header));
+                player_room = header.start_room;
+                player_rx = header.start_rx;
+                player_ry = header.start_ry;
                 ppu_off();
-                entity_set_screen(1);
-                entity_set_player(64, 160, true);
+                entity_taken_reset();
+                entity_set_screen(player_room);
+                entity_set_player(header.start_px, header.start_py, true);
                 entity_load_screen();
                 game_state = GAME;
                 break;
@@ -95,17 +102,24 @@ void main(void)
                 if (state == PLAYER_DEAD) {
                     entity_player_checkpoint();
                     break;
+                } else if (state == PLAYER_DONE) {
+                    if (!entity_player_addpoints()) {
+                        game_state = LOAD_NEXT;
+                        break;
+                    }
+                } else {
+                    // tm = readreg8(0x4019);
+                    entity_update_all();
+                    entity_compute_position(0);
+                    // tm = readreg8(0x4019);
                 }
-                // tm = readreg8(0x4019);
-                entity_update_all();
-                entity_compute_position(0);
-                // tm = readreg8(0x4019);
                 entity_draw(0);
                 entity_draw_all();
                 entity_draw_stats();
                 entity_check_load_screen();
                 if (player_pad_changed & PAD_START)
                     game_state = PAUSE;
+
                 break;
             case PAUSE:
                 pause();

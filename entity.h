@@ -22,11 +22,13 @@ enum PlayerState {
 };
 
 void __fastcall__ entity_newframe(void);
+void __fastcall__ entity_taken_reset(void);
 void __fastcall__ entity_compute_position(uint8_t index);
 void __fastcall__ entity_draw(uint8_t index);
 uint8_t __fastcall__ entity_player_control(void);
 void __fastcall__ entity_set_player(uint8_t x, uint8_t y, uint8_t chkpoint);
 void __fastcall__ entity_player_checkpoint(void);
+uint8_t __fastcall__ entity_player_addpoints(void);
 
 void __fastcall__ entity_new(uint8_t id, uint8_t x, uint8_t y);
 void __fastcall__ entity_update(void);

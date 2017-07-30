@@ -76,4 +76,6 @@ update(unsigned char x, unsigned char y, unsigned char val);
 extern void __fastcall__
 xputs(const char *str);
 
+void __fastcall__ my_memcpy(void *dst, void *src, int len);
+
 #endif // NES_DEMOS_NESUTIL_H

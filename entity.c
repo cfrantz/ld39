@@ -282,11 +282,16 @@ void __fastcall__ entity_compute_position(uint8_t entity) {
     vx = entity_vx[cur_index];
     vy = entity_vy[cur_index];
 
-    if (!(player_pad & (PAD_LEFT | PAD_RIGHT))) {
-        if (vx > 0)
-            vx -= fx;
-        else if (vx < 0)
-            vx += fx;
+    if (cur_index == 0) {
+        if (player_state == PLAYER_DEAD)
+            return;
+
+        if (!(player_pad & (PAD_LEFT | PAD_RIGHT))) {
+            if (vx > 0)
+                vx -= fx;
+            else if (vx < 0)
+                vx += fx;
+        }
     }
 
     vx += entity_ax[cur_index];
@@ -315,6 +320,14 @@ void __fastcall__ entity_newframe(void) {
     for(cur_index=0; cur_index<MAX_ENTITY; ++cur_index) {
         entity_ay[cur_index] = 0x100;
     }
+}
+
+void __fastcall__ entity_taken_reset(void) {
+    uint8_t y;
+    y = 0;
+    do {
+        entity_taken[y] = 0;
+    } while(++y);
 }
 
 void __fastcall__ entity_draw(uint8_t index) {
@@ -448,6 +461,7 @@ void __fastcall__ entity_update(void) {
     case SNAKE:
         entity_dir[cur_index] = (entity_px[0] < entity_px[cur_index]) ? -1 : 1;
         if (entity_player_collision()) {
+            // 50 points of damage
             entity_player_knockback(0x80, 0xF950);
         }
         break;
@@ -469,7 +483,8 @@ void __fastcall__ entity_update(void) {
             entity_ax[cur_index] = 0;
         } 
         if (entity_player_collision()) {
-            entity_player_knockback(0x80, 0xF925);
+            // 25 points of damage
+            entity_player_knockback(0x80, 0xF975);
         }
         break;
     case GOLD:
@@ -543,9 +558,20 @@ void __fastcall__ entity_draw_all(void) {
     }
 }
 
+uint8_t __fastcall__ entity_player_addpoints(void) {
+    if (player_energy) {
+        player_energy = bcd_add16(player_energy, 0xF999);
+        player_score = bcd_add16(player_score, 0x10);
+        return true;
+    }
+    return false;
+}
 
 uint8_t __fastcall__ entity_player_control(void) {
     static uint8_t on_ladder, a;
+
+    if (player_state == PLAYER_DONE)
+        return player_state;
 
     if (player_energy==0 || player_energy & 0x8000) {
         if (player_state == PLAYER_ALIVE) {
@@ -566,7 +592,10 @@ uint8_t __fastcall__ entity_player_control(void) {
     if (player_hit) {
         --player_hit;
         return PLAYER_ALIVE;
+    } else if (player_state == PLAYER_DEAD) {
+        return PLAYER_DEAD;
     }
+
     a = (entity_anim[0] / 4) & 3;
     entity_sprite_attr[0] = (entity_dir[0] < 0) ? 0x40 : 0;
     entity_sprite_id[0] = entity_sprites[0][a];
@@ -616,7 +645,7 @@ uint8_t __fastcall__ entity_player_control(void) {
     } else {
         if (player_jump) player_jump = 0;
     }
-    return player_state;
+    return PLAYER_ALIVE;
 }
 
 void __fastcall__ entity_check_load_screen(void) {
@@ -626,23 +655,23 @@ void __fastcall__ entity_check_load_screen(void) {
     if (xx > 248 && entity_vx[0] > 0) {
         entity_px[0] = 0;
         ++player_rx;
-        player_room = levelmap[player_ry*16+player_rx];
+        player_room = header.levelmap[player_ry*16+player_rx];
         entity_load_screen();
     } else if (xx < 8 && entity_vx[0] < 0) {
         entity_px[0] = 0xFF00;
         --player_rx;
-        player_room = levelmap[player_ry*16+player_rx];
+        player_room = header.levelmap[player_ry*16+player_rx];
         entity_load_screen();
     }
     if (yy > 232 && entity_vy[0] > 0) {
         entity_py[0] = 16;
         ++player_ry;
-        player_room = levelmap[player_ry*16+player_rx];
+        player_room = header.levelmap[player_ry*16+player_rx];
         entity_load_screen();
     } else if (yy < 16 && entity_vy[0] < 0) {
         entity_py[0] = 0xE800;
         --player_ry;
-        player_room = levelmap[player_ry*16+player_rx];
+        player_room = header.levelmap[player_ry*16+player_rx];
         entity_load_screen();
     }
 
