@@ -63,6 +63,7 @@ void main(void)
 
     entity_set_player(128, 144);
     entity_new(1, 224, 16);
+    entity_new(3, 16, 16);
     //tm = readreg8(0x401b);
     a = 0;
 	for(;;++framenum) {

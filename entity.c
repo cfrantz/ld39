@@ -10,29 +10,31 @@
 // 1: enemy type 1
 // 2: enemy type 2 (etc)
 //////////////////////////////////////////////////////////////////////
-const uint8_t entity_palette[] = {  0, 1, };
+const uint8_t entity_palette[] = {  0, 1, 0, 1};
 
-const uint8_t entity_colx_x0[] = {  1, 0, };
-const uint8_t entity_colx_y0[] = {  2, 2, };
-const uint8_t entity_colx_x1[] = {  6, 14, };
-const uint8_t entity_colx_y1[] = { 14, 14, };
+const uint8_t entity_colx_x0[] = {  1, 0,  0, 0,  };
+const uint8_t entity_colx_y0[] = {  2, 2,  0, 2,  };
+const uint8_t entity_colx_x1[] = {  6, 14, 0, 16  };
+const uint8_t entity_colx_y1[] = { 14, 14, 0, 14, };
 
-const uint8_t entity_coly_x0[] = {  2, 0, };
-const uint8_t entity_coly_y0[] = {  0, 2, };
-const uint8_t entity_coly_x1[] = {  5, 14, };
-const uint8_t entity_coly_y1[] = { 16, 16, };
+const uint8_t entity_coly_x0[] = {  2, 0,  0, 2,  };
+const uint8_t entity_coly_y0[] = {  0, 2,  0, 2,  };
+const uint8_t entity_coly_x1[] = {  5, 14, 0, 14, };
+const uint8_t entity_coly_y1[] = { 16, 16, 0, 16, };
 
 const int entity_maxx[] = {
-    0x180, 0x200,
+    0x180, 0x200, 0x0000, 0x180,
 };
 
 const int entity_maxy[] = {
-    0x500, 0x500,
+    0x500, 0x500, 0x500, 0x500,
 };
 
 const uint8_t entity_sprites[][4] = {
     { 1, 3, 1, 3 },
     { 0x11, 0x15, 0x11, 0x15 },
+    { 0, 0, 0, 0 },
+    { 0x19, 0x1d, 0x19, 0x1d },
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -275,6 +277,7 @@ void __fastcall__ entity_new(uint8_t id, uint8_t x, uint8_t y) {
 
     for(i=1; i<MAX_ENTITY; ++i) {
         if (entity_id[i] == 0) {
+            printf("spawned id=%d in %d\n", id, i);
             entity_id[i] = id;
             entity_ax[i] = 0;
             entity_ay[i] = 0;
@@ -293,15 +296,15 @@ void __fastcall__ entity_new(uint8_t id, uint8_t x, uint8_t y) {
 void __fastcall__ entity_update(void) {
     static uint8_t a;
 
+    entity_compute_position(cur_index);
     a = (entity_anim[cur_index] / 4) & 3;
     if (entity_dir[cur_index] > 0) {
         entity_sprite_attr[cur_index] |= 0x40;
     } else {
         entity_sprite_attr[cur_index] &= ~0x40;
     }
-    entity_sprite_id[cur_index] = entity_sprites[cur_index][a];
+    entity_sprite_id[cur_index] = entity_sprites[cur_id][a];
     ++entity_anim[cur_index];
-    entity_compute_position(cur_index);
 }
 
 void __fastcall__ entity_update_all(void) {
