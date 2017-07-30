@@ -11,6 +11,7 @@
 // 2: enemy type 2 (etc)
 //////////////////////////////////////////////////////////////////////
 const uint8_t entity_palette[] = {  0, 1, 0, 1};
+const uint8_t entity_physics[] = {  1, 0, 0, 1};
 
 const uint8_t entity_colx_x0[] = {  1, 0,  0, 0,  };
 const uint8_t entity_colx_y0[] = {  2, 2,  0, 2,  };
@@ -23,7 +24,7 @@ const uint8_t entity_coly_x1[] = {  5, 14, 0, 14, };
 const uint8_t entity_coly_y1[] = { 16, 16, 0, 16, };
 
 const int entity_maxx[] = {
-    0x180, 0x200, 0x0000, 0x180,
+    0x180, 0x200, 0x0000, 0x100,
 };
 
 const int entity_maxy[] = {
@@ -73,6 +74,8 @@ static uint8_t xx, yy;
 uint8_t player_pad;
 uint8_t player_jump;
 uint8_t player_screen;
+uint8_t player_hit;
+uint8_t player_inv;
 uint8_t spridx;
 
 uint8_t __fastcall__ entity_left_collision(int16_t delta) {
@@ -117,6 +120,39 @@ uint8_t __fastcall__ entity_bottom_collision(int16_t delta) {
         return yy & 0xf0;
     }
     return 0xff;
+}
+
+uint8_t __fastcall__ entity_player_collision(void) {
+    static uint8_t px0, px1, py0, py1;
+    static uint8_t ex0, ex1, ey0, ey1;
+
+    xx = entity_px[0] >> 8;
+    yy = entity_py[0] >> 8;
+    px0 = xx + entity_colx_x0[0];
+    py0 = yy + entity_colx_y0[0];
+    px1 = xx + entity_colx_x1[0];
+    py1 = yy + entity_colx_y1[0];
+
+    xx = entity_px[cur_index] >> 8;
+    yy = entity_py[cur_index] >> 8;
+    ex0 = xx + entity_colx_x0[cur_id];
+    ey0 = yy + entity_colx_y0[cur_id];
+    ex1 = xx + entity_colx_x1[cur_id];
+    ey1 = yy + entity_colx_y1[cur_id];
+
+    return !(ex1 < px0 || ey1 < py0 || ex0 > px1 || ey0 > py1);
+}
+
+void __fastcall__ entity_player_knockback(void) {
+    if (!player_inv) {
+        if (entity_dir[0] > 0) {
+            entity_ax[0] = -0x80;
+        } else {
+            entity_ax[0] = 0x80;
+        }
+        player_inv = 90;
+        player_hit = 30;
+    }
 }
 
 void __fastcall__ entity_compute_position_x(void) {
@@ -295,8 +331,12 @@ void __fastcall__ entity_new(uint8_t id, uint8_t x, uint8_t y) {
 
 void __fastcall__ entity_update(void) {
     static uint8_t a;
+    static int16_t delta;
 
-    entity_compute_position(cur_index);
+    cur_id = entity_id[cur_index];
+    if (entity_physics[cur_id])
+        entity_compute_position(cur_index);
+
     a = (entity_anim[cur_index] / 4) & 3;
     if (entity_dir[cur_index] > 0) {
         entity_sprite_attr[cur_index] |= 0x40;
@@ -305,6 +345,29 @@ void __fastcall__ entity_update(void) {
     }
     entity_sprite_id[cur_index] = entity_sprites[cur_id][a];
     ++entity_anim[cur_index];
+    switch(cur_id) {
+    case 1:  // snake
+        if (entity_player_collision()) {
+            entity_player_knockback();
+        }
+        break;
+    case 3:  // spider
+        // walk towards player
+        delta = entity_px[cur_index] - entity_px[0];
+        if (delta < 0) {
+            entity_ax[cur_index] = 0x40;
+        } else if (delta > 0) {
+            entity_ax[cur_index] = -0x40;
+        } else {
+            entity_ax[cur_index] = 0;
+        } 
+        if (entity_player_collision()) {
+            entity_player_knockback();
+        }
+        break;
+    default: // all others
+        ;
+    }
 }
 
 void __fastcall__ entity_update_all(void) {
@@ -312,6 +375,12 @@ void __fastcall__ entity_update_all(void) {
         if (entity_id[cur_index] != 0) {
             entity_update();
         }
+    }
+}
+
+void __fastcall__ entity_kill_all(void) {
+    for(cur_index=1; cur_index<MAX_ENTITY; ++cur_index) {
+        entity_id[cur_index] = 0;
     }
 }
 
@@ -323,10 +392,16 @@ void __fastcall__ entity_draw_all(void) {
     }
 }
 
+
 void __fastcall__ entity_player_control(void) {
     static uint8_t on_ladder, a;
     player_pad = pad_poll(0);
 
+    if (player_inv) --player_inv;
+    if (player_hit) {
+        --player_hit;
+        return;
+    }
     a = (entity_anim[0] / 4) & 3;
     entity_sprite_attr[0] = (entity_dir[0] < 0) ? 0x40 : 0;
     entity_sprite_id[0] = entity_sprites[0][a];
@@ -378,23 +453,37 @@ void __fastcall__ entity_player_control(void) {
     }
 }
 
-void __fastcall__ entity_load_screen(void) {
+void __fastcall__ entity_check_load_screen(void) {
     xx = entity_px[0] >> 8;
     yy = entity_py[0] >> 8;
 
     if (xx > 248 && entity_vx[0] > 0) {
         entity_px[0] = 0;
         ++player_screen;
-        goto next_screen;
+        entity_load_screen();
     } else if (xx < 8 && entity_vx[0] < 0) {
         entity_px[0] = 0xFF00;
         --player_screen;
-        goto next_screen;
+        entity_load_screen();
     }
     return;
+}
 
-next_screen:
+void __fastcall__ entity_load_screen(void) {
+    static int i;
     ppu_off();
+    oam_clear();
+    entity_kill_all();
     copy_to_vram_simple(player_screen);
-	ppu_on_all();//enable rendering
+	ppu_on_all();
+
+    for(i=0; i<16; i+=2) {
+        xx = screen[240+i];
+        printf("enemy: %x\n", xx);
+        if (xx) {
+            yy = (xx & 0x0F) << 4;
+            xx &= 0xF0;
+            entity_new(screen[240+i+1], xx, yy);
+        }
+    }
 }

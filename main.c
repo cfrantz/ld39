@@ -58,24 +58,22 @@ void main(void)
 	pal_all(palette);//set palette for sprites
 	oam_size(1);
 
-    copy_to_vram_simple(0);
-	ppu_on_all();//enable rendering
+    // Will load the first screen and turn the ppu on
+    entity_load_screen();
 
     entity_set_player(128, 144);
-    entity_new(1, 224, 16);
-    entity_new(3, 16, 16);
     //tm = readreg8(0x401b);
     a = 0;
 	for(;;++framenum) {
 		//wait for next TV frame
-        entity_load_screen();
+        entity_check_load_screen();
 		ppu_waitnmi();
         entity_newframe();
 
         entity_player_control();
     tm = readreg8(0x4019);
-        entity_compute_position(0);
         entity_update_all();
+        entity_compute_position(0);
     tm = readreg8(0x4019);
         entity_draw(0);
         entity_draw_all();

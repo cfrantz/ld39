@@ -18,7 +18,8 @@ const uint8_t level0[][16*16] = {
     "gggggggggggggggg"
     "FFFFFFFFFFFFFFFF"
     "FFFFFFFFFFFFFFFF"
-    "FFFFFFFFFFFFFFFF",
+    "FFFFFFFFFFFFFFFF"
+"\xEA\x01",
 
 // LVLDAT0 -- screen 1
     "                "
@@ -35,7 +36,8 @@ const uint8_t level0[][16*16] = {
     "F@@@@@@@@@A@@@@F"
     "F@@@@@@@@@A@@@@F"
     "F@@@@@@@@@A@@@@F"
-    "FFFFFFFFFFFFFFFF",
+    "FFFFFFFFFFFFFFFF"
+    "\x2D\x03",
 
 // LVLDAT0 -- screen 2
     "             E  "
