@@ -2,12 +2,13 @@
 #include <stdint.h>
 
 #include "nesutil.h"
+#include "levels.h"
 
-uint8_t objtable0[16][4] = {
+const uint8_t objtable0[16][4] = {
     { 0, 0, 0, 0 },  // space
 };
 
-uint8_t objtable1[16][4] = {
+const uint8_t objtable1[16][4] = {
     { 0x83, 0x83, 0x83, 0x83 },  // @
     { 0x8a, 0x8a, 0x8b, 0x8b },  // A
     { 0, 0, 0, 0 },  // B
@@ -29,44 +30,20 @@ uint8_t objtable1[16][4] = {
 };
 
 
-#pragma data-name(push, "LEVELDATA")
-uint8_t screen0[16*15] =
-"                "
-"                "
-"                "
-"                "
-"                "
-"    EEE       E "
-"              E "
-"      EEEE   EE "
-"                "
-"            D   "
-"           DD   "
-"gggggggggggggggg"
-"FFFFFFFFFFFFFFFF"
-"FFFFFFFFFFFFFFFF"
-"FFFFFFFFFFFFFFFF";
-
-uint8_t screen[16*15] =
-"                "
-"                "
-"    EEE       E "
-"              E "
-"      EEEE   EE "
-"                "
-"            D   "
-"           DD   "
-"ggggggggggAggggg"
-"FIIIIIIIIIAIIIIF"
-"F@@@@@@@@@A@@@@F"
-"F@@@@@@@@@A@@@@F"
-"F@@@@@@@@@A@@@@F"
-"F@@@@@@@@@A@@@@F"
-"FFFFFFFFFFFFFFFF";
+#if 1
+#pragma data-name(push, "MORERAM")
+uint8_t screen[16*15];
 #pragma data-name(pop)
+#endif
 
-void copy_to_vram_simple() {
+void copy_to_vram_simple(int n) {
     static uint8_t x, y, i, a, t;
+
+    y = 240;
+    while(y) {
+        --y;
+        screen[y] = level0[n][y];
+    }
 
     vram_put_addr(0x2000);
     for(y=0; y<15; y++) {
@@ -105,9 +82,7 @@ void copy_to_vram_simple() {
                 ((screen[(y+1)*16+(x+0)] & 0x60) >> 1) |
                 ((screen[(y+1)*16+(x+1)] & 0x60) << 1);
             vram_put_data(a);
-            printf("%02x ", a);
         }
-        printf("\n");
     }
 }
 

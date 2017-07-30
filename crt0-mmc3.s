@@ -3,9 +3,10 @@
 
 
 NES_MAPPER				=4	;mapper number
-NES_PRG_BANKS			=2	;number of 16K PRG banks, change to 2 for NROM256
+NES_PRG_BANKS			=4	;number of 16K PRG banks, change to 2 for NROM256
 NES_CHR_BANKS			=1	;number of 8K CHR banks
 NES_MIRRORING			=1	;0 horizontal, 1 vertical, 8 four screen
+NES_SRAM            	=1	;have sram?
 
 FT_DPCM_OFF				=$ffc0	;samples offset, $c000 or higher, 64-byte steps
 FT_SFX_STREAMS			=4	;number of sound effects played at once, can be 4 or less (faster)
@@ -97,7 +98,7 @@ FT_DPCM_PTR		=(FT_DPCM_OFF&$3fff)>>6
     .byte $4e,$45,$53,$1a
 	.byte NES_PRG_BANKS
 	.byte NES_CHR_BANKS
-	.byte NES_MIRRORING|(NES_MAPPER<<4)
+	.byte NES_MIRRORING|(NES_SRAM<<1)|(NES_MAPPER<<4)
 	.byte NES_MAPPER&$f0
 	.res 8,0
 
@@ -301,7 +302,7 @@ mmc3boot:
     lda #0
     inx
     jsr mmc3_reg
-    lda #1
+    lda #$fd
     inx
     jsr mmc3_reg
 
