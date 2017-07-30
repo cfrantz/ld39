@@ -15,7 +15,7 @@ const unsigned char palette[32]={
 
 	// Sprite palette
 	0x0F, 0x02, 0x07, 0x26,
-	0x0F, 0x16, 0x00, 0x2d,
+	0x0F, 0x16, 0x2d, 0x0f,
 	0x0F, 0x02, 0x11, 0x20,
 	0x0F, 0x19, 0x29, 0x39,
 };
@@ -60,9 +60,6 @@ void main(void)
 
     copy_to_vram_simple(0);
 	ppu_on_all();//enable rendering
-    writereg8(0xc000, 24);
-    writereg8(0xc001, 24);
-    writereg8(0xe001, 24);
 
     entity_set_player(128, 144);
     entity_new(1, 224, 16);
@@ -73,12 +70,6 @@ void main(void)
         entity_load_screen();
 		ppu_waitnmi();
         entity_newframe();
-        //tm = readreg8(0x401b);
-        val = readreg8(0x1f);
-        while(val == readreg8(0x1f))
-            ;
-
-        scroll(0, 24);
 
         entity_player_control();
     tm = readreg8(0x4019);
