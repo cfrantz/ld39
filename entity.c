@@ -667,8 +667,7 @@ void __fastcall__ entity_check_load_screen(void) {
         --player_rx;
         player_room = header.levelmap[player_ry*16+player_rx];
         entity_load_screen();
-    }
-    if (yy > 232 && entity_vy[0] > 0) {
+    } else if (yy > 232 && entity_vy[0] > 0) {
         entity_py[0] = 16;
         ++player_ry;
         player_room = header.levelmap[player_ry*16+player_rx];

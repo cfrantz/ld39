@@ -61,6 +61,7 @@ void main(void)
 	pal_all(palette);//set palette for sprites
 	oam_size(1);
 
+    load_bank = 0;
     // Will load the first screen and turn the ppu on
     //tm = readreg8(0x401b);
     ppu_off();
