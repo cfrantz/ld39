@@ -306,6 +306,10 @@ mmc3boot:
     inx
     jsr mmc3_reg
 
+    ; Enable the SRAM in the mapper
+    lda #$80
+    sta $a001
+
     jmp start
 
 .segment "VECTORS"
