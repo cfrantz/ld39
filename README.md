@@ -8,7 +8,10 @@ Lil Digger is for the Nintendo Entertainment System.
 
 You're running out of enegy.  Go spelunking for Energy Crystals.  You'll need
 to collect keys to open doors, and watch out for snakes and spiders!
-Collect gold for extra points.
+Collect gold for extra points.  Blue flags are checkpoints, red flags are
+the end of the level.
+
+This game takes quite a bit of inspiration from Atari Pitfall and Pitfall II.
 
 Meta: The theme for "LD39" is "Running out of Power". The NES hardly has any
 power to begin with!
