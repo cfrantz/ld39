@@ -72,7 +72,7 @@ nmi:
 	ldy #0
     lda #$20
 	sta PPU_ADDR
-	sty PPU_ADDR
+	sta PPU_ADDR
 @updName:
 	lda (NAME_UPD_ADR),y
 	iny
