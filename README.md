@@ -16,6 +16,14 @@ This game takes quite a bit of inspiration from Atari Pitfall and Pitfall II.
 Meta: The theme for "LD39" is "Running out of Power". The NES hardly has any
 power to begin with!
 
+## How to Play
+
+This game is for the Nintendo Entertainment System.  In order to play it
+you will need either an emulator or a real NES with a flash cart (such as
+an Everdrive).
+
+I've tested on *fceux* and with an *Everdrive* on a real NES.
+
 ## Contols
 
 * D-Pad - left/right, climb ladders.
