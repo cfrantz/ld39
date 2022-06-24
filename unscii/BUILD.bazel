@@ -1,0 +1,17 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "unscii",
+    textual_hdrs = [
+        "ascii-ctrl.h",
+        "ascii-ext.h",
+        "ascii-lower.h",
+        "ascii-symdigit.h",
+        "ascii-upper.h",
+        "mcr-lower.h",
+        "mcr-symdigit.h",
+        "mcr-upper.h",
+        "unscii-pseudogfx.h",
+    ],
+)
+

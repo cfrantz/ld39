@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-uint16_t __fastcall__ bcd_add16(uint16_t a, uint16_t b) {
+uint16_t bcd_add16(uint16_t a, uint16_t b) {
     static uint16_t t1, t2;
 
     t1 = a + 0x0666;
@@ -12,7 +12,7 @@ uint16_t __fastcall__ bcd_add16(uint16_t a, uint16_t b) {
     return t1 - t2;
 }
 
-uint16_t __fastcall__ bcd_sub16(uint16_t a, uint16_t b) {
+uint16_t bcd_sub16(uint16_t a, uint16_t b) {
     b = 0x9999 - b;
     return bcd_add16(a, bcd_add16(b, 1));
 }

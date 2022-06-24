@@ -26,6 +26,7 @@ ____,____,____,____,____,____,____,____,____,____,____,____,____,____,____,____,
     1,         // start room
     0, 0,      // start position in the map (above)
     104, 80,   // pixel location in start room
+    0,         // Next bank
 };
 
 const uint8_t level1[][16*16] = {

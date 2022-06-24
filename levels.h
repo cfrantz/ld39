@@ -18,5 +18,6 @@ extern struct LevelHeader header;
 
 extern const uint8_t level0[][16*16];
 extern const struct LevelHeader header0;
+extern const struct LevelHeader header1;
 
 #endif // LD39_LEVELS_H

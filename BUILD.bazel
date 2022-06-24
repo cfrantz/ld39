@@ -1,0 +1,94 @@
+package(default_visibility = ["//visibility:public"])
+load("@crt//rules:transition.bzl", "platform_target")
+
+cc_library(
+    name = "neslib",
+    hdrs = ["neslib.h"],
+    textual_hdrs = [
+        "neslib-mmc3.s",
+        "famitone.s",
+        "music.s",
+        "sounds.s",
+    ],
+    srcs = ["crt0-mmc3.s"],
+)
+
+cc_library(
+    name = "nesutil",
+    hdrs = ["nesutil.h"],
+    srcs = ["nesutil.c"],
+    deps = [
+        ":neslib",
+    ],
+)
+
+cc_library(
+    name = "bcd",
+    hdrs = ["bcd.h"],
+    srcs = ["bcd.c"],
+)
+
+cc_library(
+    name = "chars",
+    hdrs = ["binary.h"],
+    srcs = [
+        "chars.c",
+        "sprites.c",
+    ],
+    deps = [
+        "//unscii",
+    ],
+)
+
+cc_library(
+    name = "levels",
+    hdrs = ["levels.h"],
+    srcs = [
+        "levels.c",
+        "level2.c",
+    ],
+)
+
+cc_library(
+    name = "screen",
+    hdrs = ["screen.h"],
+    srcs = [ "screen.c" ],
+    deps = [
+        ":nesutil",
+        ":levels",
+    ],
+)
+
+cc_library(
+    name = "entity",
+    hdrs = ["entity.h"],
+    srcs = [ "entity.c" ],
+    deps = [
+        ":bcd",
+        ":levels",
+        ":nesutil",
+        ":screen",
+    ],
+)
+
+cc_binary(
+    name = "lildigger",
+    srcs = [
+        "main.c",
+    ],
+    linkopts = [
+        "-C", "$(location nes-mmc3.ld)",
+    ],
+    deps = [
+        ":chars",
+        ":neslib",
+        ":entity",
+        "nes-mmc3.ld",
+    ],
+)
+
+platform_target(
+    name = "lildigger_nes",
+    platform = "@crt//platforms/m6502:nintendo-nes",
+    target = ":lildigger",
+)

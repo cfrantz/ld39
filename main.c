@@ -31,6 +31,7 @@ uint8_t spridx;
 uint8_t player_room;
 uint8_t player_rx, player_ry;
 
+
 enum GameMode {
     TITLE_SCREEN,
     GAME,
@@ -39,6 +40,20 @@ enum GameMode {
 };
 
 enum GameMode game_state;
+
+extern const uint8_t unscii[];
+extern const uint8_t sprites[];
+
+/* Reference symbols which have no direct references in the
+ * code to force the linker to include them into the linked
+ * executable file.
+ */
+const void * const useless_decl_to_force_linking[] = {
+    (const void const*)&header0,
+    (const void const*)&header1,
+    (const void const*)unscii,
+    (const void const*)sprites,
+};
 
 void pause(void) {
     static uint8_t x, y;

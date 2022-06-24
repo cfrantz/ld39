@@ -2,3 +2,4 @@
 *.nes.sram
 *.map
 imgui.ini
+bazel-*
