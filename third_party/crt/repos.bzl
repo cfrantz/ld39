@@ -12,6 +12,6 @@ def crt_repos(local=None):
             http_archive,
             name = "crt",
             url = "https://github.com/cfrantz/crt/archive/refs/tags/cc65-2022-06-23.tar.gz",
-            sha256 = "8f0f05899e21d2baf2eee883399f1ab914236035fb383585a415b06ffab25fa6",
+            sha256 = "477df93f5fe89b9be48be756a1060705cef16fc3c7b9fb09fc4cc28cb4b87891",
             strip_prefix = "crt-cc65-2022-06-23",
         )
